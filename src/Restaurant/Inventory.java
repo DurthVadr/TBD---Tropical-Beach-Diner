@@ -12,12 +12,12 @@ public class Inventory {
     }
     
     Item buyItem(Item item) {
-
+        items.add(item);
         return item;
     }
 
     Item takeItem(Item item) {
-
+        items.remove(item);
         return item;
     }
 }
