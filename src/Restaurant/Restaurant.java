@@ -5,8 +5,10 @@ public class Restaurant {
     //it might be ınterface I am not sure
 
     Customer createCustomer() {
-        //TODO: Implement
-        return null;
+        Order createOrder(Customer customer);
+        void openInventory();
+        Item prepareOrder(Item... items);
+        float serve(Item item, Customer customer);
     }
 
     Order createOrder(Customer customer) {

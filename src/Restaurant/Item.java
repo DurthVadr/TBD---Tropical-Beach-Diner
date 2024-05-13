@@ -11,10 +11,7 @@ public class Item {
     }
 
     changeAmount(Integer n) {
-         //TODO: Implement
-        
-        n = amount;
-        return amount;
+        this.amount += n;
     }
 
 }
