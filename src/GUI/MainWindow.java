@@ -2,6 +2,10 @@ package GUI;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MainWindow {
     JLabel GameNameLabel;
@@ -13,6 +17,12 @@ public class MainWindow {
         this.GameNameLabel = GameNameLabel;
         this.StartGameButton = StartGameButton;
         this.ExitGameButton = ExitGameButton;
+
+        JPanel panel = new JPanel();
+        panel.add(this.GameNameLabel);
+        panel.add(this.StartGameButton);
+        panel.add(this.ExitGameButton);
+        add(panel);
     }
 
     void startGameButtonClicked(JButton StartGameButton) {
