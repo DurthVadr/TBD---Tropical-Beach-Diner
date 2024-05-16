@@ -23,6 +23,20 @@ public class MainWindow {
         panel.add(this.StartGameButton);
         panel.add(this.ExitGameButton);
         add(panel);
+
+        this.StartGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startGameButtonClicked(StartGameButton);
+            }
+        });
+
+        this.ExitGameButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exitGameButtonClicked(ExitGameButton);
+            }
+        });
     }
 
     void startGameButtonClicked(JButton StartGameButton) {
