@@ -1,6 +1,6 @@
 package Restaurant;
 
-public class Restaurant {
+public interface Restaurant {
 
     //it might be ınterface I am not sure
 
