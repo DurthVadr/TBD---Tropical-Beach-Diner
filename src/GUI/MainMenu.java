@@ -7,13 +7,13 @@ import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class MainWindow {
+public class MainMenu {
     JLabel GameNameLabel;
     JButton StartGameButton;
     JButton ExitGameButton;
 
 
-    public MainWindow(JLabel GameNameLabel, JButton StartGameButton, JButton ExitGameButton) {
+    public MainMenu(JLabel GameNameLabel, JButton StartGameButton, JButton ExitGameButton) {
         this.GameNameLabel = GameNameLabel;
         this.StartGameButton = StartGameButton;
         this.ExitGameButton = ExitGameButton;
