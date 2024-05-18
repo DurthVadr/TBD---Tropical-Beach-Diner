@@ -34,5 +34,12 @@ public class GameScreen {
             });
         }
     }
+    public void setScoreLabel(JLabel textLabel) {
+        this.scoreLabel = textLabel;
+    }
+
+    public JLabel getScoreLabel() {
+        return scoreLabel;
+    }
 
 }
