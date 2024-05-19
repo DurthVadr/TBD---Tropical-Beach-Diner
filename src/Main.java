@@ -23,7 +23,7 @@ public class Main {
         GameScreen gameScreen = new GameScreen(gameLogic);
         Controller controller = new Controller(mainMenu, gameScreen, gameLogic);
 
-        // Start the game
-        controller.startGame();
+        // Show the main menu initially
+        mainMenu.setVisible(true);
     }
 }
