@@ -1,13 +1,17 @@
 package Restaurant;
 
 public class Order {
-    ArrayList<Item> orderSpecifics = new ArrayList<Item>();
+
+    private Customer customer;
     Float price;
 
-
-    public Order(ArrayList<Item> orderSpecifics, Float price) {
-        this.orderSpecifics = orderSpecifics;
-        this.price = price;
+    public Order(Customer customer) {
+        this.customer = customer;
     }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
     
 }

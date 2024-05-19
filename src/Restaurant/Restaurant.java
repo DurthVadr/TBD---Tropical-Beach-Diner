@@ -1,32 +1,65 @@
 package Restaurant;
 
-public interface Restaurant {
+import java.util.ArrayList;
+import java.util.List;
 
-    //it might be ınterface I am not sure
+public class Restaurant {
+    private Inventory inventory;
+    private List<Customer> customers;
 
-    Customer createCustomer() {
-        Order createOrder(Customer customer);
-        void openInventory();
-        Item prepareOrder(Item... items);
-        float serve(Item item, Customer customer);
+    public Restaurant() {
+        this.inventory = new Inventory();
+        this.customers = new ArrayList<>();
     }
 
-    Order createOrder(Customer customer) {
-        //TODO: Implement
+    public Customer createCustomer(String name, float satisfaction) {
+        Customer newCustomer = new Customer(name, satisfaction);
+        customers.add(newCustomer);
+        return newCustomer;
+    }
+
+    public Order createOrder(Customer customer) {
+        if (customer != null) {
+            Order newOrder = new Order(customer);
+            customer.setOrder(newOrder);
+            return newOrder;
+        }
         return null;
     }
 
-    void openInventory() {
+    public void openInventory() {
+        // Logic to display or manage inventory
+        // For example, printing out the inventory items
+        System.out.println(inventory);
     }
 
-    void prepareOrder(List<Item> items) {
-        return items;
+    public List<Item> prepareOrder(Item... items) {
+        List<Item> preparedItems = new ArrayList<>();
+        for (Item item : items) {
+            // Check if item is available in inventory and prepare it
+            if (inventory.hasItem(item)) {
+                inventory.removeItem(item);
+                preparedItems.add(item);
+            }
+        }
+        return preparedItems;
     }
 
-    Float serve(Item item, Customer customer) {
-        return null;
-
+    public float serve(Item item, Customer customer) {
+        if (item != null && customer != null) {
+            // Logic to serve the item to the customer
+            customer.receiveItem(item);
+            return item.getPrice(); // Return the price for billing purposes
+        }
+        return 0;
     }
 
-    //Also player
+    // Getters and setters for inventory and customers if needed
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public List<Customer> getCustomers() {
+        return customers;
+    }
 }

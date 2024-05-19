@@ -1,18 +1,29 @@
+import GUI.Controller;
+import GUI.GameScreen;
+import GUI.MainMenu;
+import GameEngine.CustomerManager;
+import GameEngine.GameLogic;
+import GameEngine.InventoryManager;
+import GameEngine.RestaurantManager;
+import GameEngine.TimeManager;
+
 public class Main {
-
     public static void main(String[] args) {
+        // Initialize the game components
+        CustomerManager customerManager = new CustomerManager();
+        InventoryManager inventoryManager = new InventoryManager();
+        RestaurantManager restaurantManager = new RestaurantManager(customerManager, inventoryManager);
+        TimeManager timeManager = new TimeManager();
 
-        Customer customer = new Customer("Cemil", 1.0f); //initial satisfaction can be 1 or 0 ?
+        // Initialize the game logic
+        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager);
 
-        Item burger = new Item("Big Mac", 1);
-        Item fries = new Item("Large Fries", 1);
-        Item coke = new Item("Coke", 2);
+        // Initialize the GUI components
+        MainMenu mainMenu = new MainMenu(gameLogic);
+        GameScreen gameScreen = new GameScreen(gameLogic);
+        Controller controller = new Controller(mainMenu, gameScreen, gameLogic);
 
-        List<Item> itemsOrdered = new ArrayList<>();
-        itemsOrdered.add(burger);
-        itemsOrdered.add(fries);
-        itemsOrdered.add(coke);
-
-        System.out.println("Customer Name: " + customer.getName());
+        // Start the game
+        controller.startGame();
     }
 }

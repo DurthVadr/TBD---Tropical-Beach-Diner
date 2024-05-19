@@ -1,45 +1,58 @@
 package GUI;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import GameEngine.GameLogic;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
-public class GameScreen {
-    List<JButton> tableAreaButtons;
-    List<JButton> kitchenAreaButtons;
-    JLabel informationText;
-    JLabel scoreLabel;
 
-    public GameScreen(List<JButton> tableAreaButtons, List<JButton> kitchenAreaButtons, JLabel informationText, JLabel scoreLabel) {
-        this.tableAreaButtons = tableAreaButtons;
-        this.kitchenAreaButtons = kitchenAreaButtons;
-        this.informationText = informationText;
-        this.scoreLabel = scoreLabel;
+public class GameScreen extends JFrame {
+    private GameLogic gameLogic;
+    private JButton[] tableAreaButtons;
+    private JButton[] kitchenAreaButtons;
 
-        for (JButton button : tableAreaButtons) {
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    tableButtonClicked(button);
-                }
-            });
-        }
-
-        for (JButton button : kitchenAreaButtons) {
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    itemsButtonClicked(button);
-                }
-            });
-        }
-    }
-    public void setScoreLabel(JLabel textLabel) {
-        this.scoreLabel = textLabel;
+    public GameScreen(GameLogic gameLogic) {
+        this.gameLogic = gameLogic;
+        initUI();
     }
 
-    public JLabel getScoreLabel() {
-        return scoreLabel;
+    private void initUI() {
+        setTitle("Tropical Beach Dinner - Game Screen");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        // Initialize buttons (example setup, adjust as needed)
+        tableAreaButtons = new JButton[10]; // Example size
+        kitchenAreaButtons = new JButton[5]; // Example size
+
+        JPanel tablePanel = new JPanel();
+        tablePanel.setLayout(new GridLayout(2, 5)); // Example layout
+
+        for (int i = 0; i < tableAreaButtons.length; i++) {
+            tableAreaButtons[i] = new JButton("Table " + (i + 1));
+            tablePanel.add(tableAreaButtons[i]);
+        }
+
+        JPanel kitchenPanel = new JPanel();
+        kitchenPanel.setLayout(new GridLayout(1, 5)); // Example layout
+
+        for (int i = 0; i < kitchenAreaButtons.length; i++) {
+            kitchenAreaButtons[i] = new JButton("Kitchen " + (i + 1));
+            kitchenPanel.add(kitchenAreaButtons[i]);
+        }
+
+        setLayout(new BorderLayout());
+        add(tablePanel, BorderLayout.CENTER);
+        add(kitchenPanel, BorderLayout.SOUTH);
+    }
+
+    public JButton[] getTableAreaButtons() {
+        return tableAreaButtons;
+    }
+
+    public JButton[] getKitchenAreaButtons() {
+        return kitchenAreaButtons;
     }
 
 }
