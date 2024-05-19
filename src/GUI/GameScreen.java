@@ -1,6 +1,7 @@
 package GUI;
 
 import GameEngine.GameLogic;
+import GameEngine.TimeManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +12,7 @@ public class GameScreen extends JFrame {
     private JButton[] tableAreaButtons;
     private JTextArea gameChatArea;
 
-
+    private TimeManager timeManager;
     private JLabel timerLabel;
     private JLabel satisfactionLabel;
     private JLabel moneyLabel;
@@ -30,20 +31,21 @@ public class GameScreen extends JFrame {
         setResizable(false);
 
         // Initialize labels
-        timerLabel = new JLabel("Time: 00:00");
+        timerLabel = new JLabel("Time: 05:00");
         satisfactionLabel = new JLabel("Satisfaction: 100%");
         moneyLabel = new JLabel("Money: $0");
 
         // Top panel for timer, satisfaction, and money labels
         JPanel topPanel = new JPanel();
-        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10)); // Adjust layout as needed
+        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
         topPanel.add(timerLabel);
         topPanel.add(satisfactionLabel);
         topPanel.add(moneyLabel);
-        // Debug: Add a border to see if the panel is visible
-        topPanel.setBorder(BorderFactory.createLineBorder(Color.RED));
-
         add(topPanel, BorderLayout.NORTH);
+
+        // Initialize TimeManager and start the timer
+        timeManager = new TimeManager(timerLabel);
+        timeManager.startTimer(300);
 
 
         // Color definition
@@ -82,13 +84,10 @@ public class GameScreen extends JFrame {
 
         // Layout management
         getContentPane().setLayout(new BorderLayout());
-        add(topPanel, BorderLayout.NORTH); // Ensure top panel is added first
+        add(topPanel, BorderLayout.NORTH);
         add(kitchenPanel, BorderLayout.WEST);
         add(tablePanel, BorderLayout.EAST);
         add(scrollPane, BorderLayout.SOUTH);
-
-        // Ensure visibility
-        setVisible(true);
     }
 
     public JButton[] getKitchenAreaButtons() {
