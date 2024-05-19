@@ -13,10 +13,9 @@ public class Main {
         CustomerManager customerManager = new CustomerManager();
         InventoryManager inventoryManager = new InventoryManager();
         RestaurantManager restaurantManager = new RestaurantManager(customerManager, inventoryManager);
-        TimeManager timeManager = new TimeManager();
 
         // Initialize the game logic
-        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager);
+        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager);
 
         // Initialize the GUI components
         MainMenu mainMenu = new MainMenu(gameLogic);

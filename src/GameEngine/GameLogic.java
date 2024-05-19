@@ -7,11 +7,10 @@ public class GameLogic {
     private TimeManager timeManager;
 
     public GameLogic(CustomerManager customerManager, InventoryManager inventoryManager,
-                     RestaurantManager restaurantManager, TimeManager timeManager) {
+                     RestaurantManager restaurantManager) {
         this.customerManager = customerManager;
         this.inventoryManager = inventoryManager;
         this.restaurantManager = restaurantManager;
-        this.timeManager = timeManager;
     }
 
     public void startNewGame() {
