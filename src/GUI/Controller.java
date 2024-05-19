@@ -1,29 +1,36 @@
 package GUI;
+
+import GameEngine.GameLogic;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 public class Controller {
     private MainMenu mainMenu;
     private GameScreen gameScreen;
+    private GameLogic gameLogic;
 
-    public Controller(MainMenu mainMenu, GameScreen gameScreen) {
+    public Controller(MainMenu mainMenu, GameScreen gameScreen, GameLogic gameLogic) {
         this.mainMenu = mainMenu;
         this.gameScreen = gameScreen;
+        this.gameLogic = gameLogic;
 
-        mainMenu.StartGameButton.addActionListener(new ActionListener() {
+        mainMenu.getStartGameButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainMenuAction(e);
+                startGame();
             }
         });
 
-        mainMenu.ExitGameButton.addActionListener(new ActionListener() {
+        mainMenu.getExitGameButton().addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                mainMenuAction(e);
+                exitGame();
             }
         });
 
-        for (JButton button : gameScreen.tableAreaButtons) {
+        for (JButton button : gameScreen.getTableAreaButtons()) {
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -32,7 +39,7 @@ public class Controller {
             });
         }
 
-        for (JButton button : gameScreen.kitchenAreaButtons) {
+        for (JButton button : gameScreen.getKitchenAreaButtons()) {
             button.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -40,5 +47,19 @@ public class Controller {
                 }
             });
         }
+    }
+
+    public void startGame() {
+        mainMenu.setVisible(false);
+        gameScreen.setVisible(true);
+        gameLogic.startNewGame();
+    }
+
+    public void exitGame() {
+        System.exit(0);
+    }
+
+    private void gameScreenAction(ActionEvent e) {
+        // Handle game screen actions
     }
 }
