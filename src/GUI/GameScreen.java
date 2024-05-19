@@ -11,6 +11,12 @@ public class GameScreen extends JFrame {
     private JButton[] tableAreaButtons;
     private JTextArea gameChatArea;
 
+
+    private JLabel timerLabel;
+    private JLabel satisfactionLabel;
+    private JLabel moneyLabel;
+
+
     public GameScreen(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
         initUI();
@@ -18,10 +24,29 @@ public class GameScreen extends JFrame {
 
     private void initUI() {
         setTitle("Tropical Beach Dinner - Game Screen");
-        setSize(800, 600);  // Adjust size for better control over layout
+        setSize(1280, 720);  // Adjust size for better control over layout
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
 
+        // Initialize labels
+        timerLabel = new JLabel("Time: 00:00");
+        satisfactionLabel = new JLabel("Satisfaction: 100%");
+        moneyLabel = new JLabel("Money: $0");
+
+        // Top panel for timer, satisfaction, and money labels
+        JPanel topPanel = new JPanel();
+        topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10)); // Adjust layout as needed
+        topPanel.add(timerLabel);
+        topPanel.add(satisfactionLabel);
+        topPanel.add(moneyLabel);
+        // Debug: Add a border to see if the panel is visible
+        topPanel.setBorder(BorderFactory.createLineBorder(Color.RED));
+
+        add(topPanel, BorderLayout.NORTH);
+
+
+        // Color definition
         Color lightBrown = new Color(205, 133, 63); // This is a light brown color (RGB)
 
 
@@ -57,9 +82,13 @@ public class GameScreen extends JFrame {
 
         // Layout management
         getContentPane().setLayout(new BorderLayout());
+        add(topPanel, BorderLayout.NORTH); // Ensure top panel is added first
         add(kitchenPanel, BorderLayout.WEST);
         add(tablePanel, BorderLayout.EAST);
         add(scrollPane, BorderLayout.SOUTH);
+
+        // Ensure visibility
+        setVisible(true);
     }
 
     public JButton[] getKitchenAreaButtons() {

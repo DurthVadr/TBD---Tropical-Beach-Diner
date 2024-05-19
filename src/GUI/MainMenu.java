@@ -24,6 +24,7 @@ public class MainMenu extends JFrame {
         setSize(1280, 720); // Set window size to 1280x720 pixels
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
 
         // Initialize components
         titleLabel = new JLabel("Tropical Beach Dinner", SwingConstants.CENTER);
