@@ -19,8 +19,6 @@ public class Main {
 
         // Initialize the GUI components
         MainMenu mainMenu = new MainMenu(gameLogic);
-        GameScreen gameScreen = new GameScreen(gameLogic);
-        Controller controller = new Controller(mainMenu, gameScreen, gameLogic);
 
         // Show the main menu initially
         mainMenu.setVisible(true);

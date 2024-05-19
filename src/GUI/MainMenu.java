@@ -112,6 +112,4 @@ public class MainMenu extends JFrame {
         panel.add(button);
         return panel;
     }
-
-
 }
