@@ -24,18 +24,19 @@ public class RestaurantManager {
         this.gameScreen = gameLogic.getGameScreen();
     }
     // Add a customer to a specific table
-    public void addCustomerToTable(int tableNumber, Customer customer) {
-        if (tableNumber < 0 || tableNumber > TOTAL_TABLES) {
+    public void addCustomerToTable(int tableIndex, Customer customer) {
+        if (tableIndex < 0 || tableIndex > TOTAL_TABLES) {
             throw new IllegalArgumentException("Invalid table number");
         }
-        tableCustomerMap.put(tableNumber, customer);
-        System.out.println("Customer added to table " + tableNumber);
-        gameScreen.addCustomerToTable(customer, tableNumber);
+        tableCustomerMap.put(tableIndex, customer);
+        System.out.println("Customer added to table " + tableIndex);
+        gameScreen.addCustomerToTable(customer, tableIndex);
+        gameLogic.scheduleCustomerOrder(customer, tableIndex);
     }
 
     // Find an available table
     public int findAvailableTable() {
-        for (int i = 0; i <= TOTAL_TABLES; i++) {
+        for (int i = 0; i < TOTAL_TABLES; i++) {
             if (!isTableOccupied(i)) {
                 return i;
             }
