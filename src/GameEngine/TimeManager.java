@@ -10,14 +10,14 @@ public class TimeManager {
     private JLabel timerLabel;
     private TimerTask timerTask;
 
-
     public TimeManager(JLabel timerLabel) {
         this.timerLabel = timerLabel;
     }
 
+
     public void startTimer(int seconds) {
-        seconds=seconds+1;
-        totalTime = seconds; // Initialize total time with the given seconds
+        totalTime = seconds+1; // Initialize total time with the given seconds
+        //+1 second is added so that player can feel the actual time.
         timer = new Timer();
         createNewTimerTask();
         timer.scheduleAtFixedRate(timerTask, 0, 1000); // Schedule task to run every second
@@ -45,15 +45,24 @@ public class TimeManager {
     }
 
     public void pauseTimer() {
-        if (timer != null) {
+        if (timerTask != null) {
             timerTask.cancel();
         }
     }
 
     public void resumeTimer() {
         if (timer != null) {
-            createNewTimerTask();
-            timer.scheduleAtFixedRate(timerTask, 0, 1000);
+            timer.cancel(); // Cancel the existing timer to ensure a fresh start
         }
+        timer = new Timer();
+        createNewTimerTask();
+        timer.scheduleAtFixedRate(timerTask, 1000, 1000); // Start after 1 second, then run every second
+    }
+
+    public void resetTimer() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new Timer();
     }
 }

@@ -144,9 +144,11 @@ public class GameScreen extends JFrame {
     }
 
     private void resumeButtonClicked() {
+        //timeManager.resetTimer(); // Reset the timer to avoid multiple tasks running
         timeManager.resumeTimer();
         pauseButton.setText("Pause");
         pauseMenuPanel.setVisible(false);
+        isPaused = false;
     }
 
     private static void quitButtonClicked() {
@@ -160,8 +162,8 @@ public class GameScreen extends JFrame {
             timeManager.pauseTimer();
             pauseButton.setText("Resume");
             pauseMenuPanel.setVisible(true); // Show the pause menu
+            isPaused = true;
         }
-        isPaused = !isPaused;
     }
 
     public JButton[] getKitchenAreaButtons() {
