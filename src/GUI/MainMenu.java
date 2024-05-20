@@ -1,15 +1,11 @@
 package GUI;
 
 import GameEngine.*;
-
 import javax.swing.*;
 import java.awt.*;
 
 public class MainMenu extends JFrame {
-    private JLabel titleLabel;
     private JButton startGameButton;
-    private JButton loadGameButton;
-    private JButton optionsButton;
     private JButton exitGameButton;
 
 
@@ -25,15 +21,15 @@ public class MainMenu extends JFrame {
         setResizable(false);
 
         // Initialize components
-        titleLabel = new JLabel("Tropical Beach Dinner", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Tropical Beach Dinner", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 36)); // Set font for the title
         titleLabel.setPreferredSize(new Dimension(1280, 130));
 
         startGameButton = new JButton("Start New Game");
         startGameButton.setPreferredSize(new Dimension(340, 100));
-        loadGameButton = new JButton("Load Game");
+        JButton loadGameButton = new JButton("Load Game");
         loadGameButton.setPreferredSize(new Dimension(340, 100));
-        optionsButton = new JButton("Options");
+        JButton optionsButton = new JButton("Options");
         optionsButton.setPreferredSize(new Dimension(340, 100));
         exitGameButton = new JButton("Exit Game");
         exitGameButton.setPreferredSize(new Dimension(340, 100));
@@ -80,20 +76,20 @@ public class MainMenu extends JFrame {
 
     private void startGameButtonClicked() {
 
+
         // Initialize the game components
         CustomerManager customerManager = new CustomerManager();
         InventoryManager inventoryManager = new InventoryManager();
         RestaurantManager restaurantManager = new RestaurantManager();
         TimeManager timeManager = new TimeManager();
+        GameScreen gameScreen = new GameScreen();
+
 
 
         // Initialize the game logic
-        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager);
-
-
-        gameLogic.startNewGame();
+        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
         dispose();
-        new GameScreen(gameLogic, this).setVisible(true); // Pass MainMenu reference
+        gameLogic.startNewGame();
     }
 
     private void loadGameButtonClicked() {
@@ -109,8 +105,6 @@ public class MainMenu extends JFrame {
     }
 
     public JButton getStartGameButton() {
-
-
         return startGameButton;
     }
 

@@ -8,6 +8,9 @@ public class TimeManager {
     private int totalTime; // Total time in seconds
     private Timer timer;
 
+    private boolean isPaused = false;
+
+
     public void setTimerLabel(JLabel timerLabel) {
         this.timerLabel = timerLabel;
     }
@@ -72,5 +75,13 @@ public class TimeManager {
             timer.cancel();
         }
         timer = new Timer();
+    }
+
+    public boolean isPaused() {
+        return isPaused;
+    }
+
+    public void setPaused(boolean paused) {
+        isPaused = paused;
     }
 }
