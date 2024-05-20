@@ -14,10 +14,21 @@ import java.util.TimerTask;
 
 public class GameScreen extends JFrame {
 
+    public void setGameLogic(GameLogic gameLogic) {
+        this.gameLogic = gameLogic;
+    }
+
     private GameLogic gameLogic;
+
+    public void setCustomerManager(CustomerManager customerManager) {
+        this.customerManager = customerManager;
+    }
+
+    public void setTimeManager(TimeManager timeManager) {
+        this.timeManager = timeManager;
+    }
+
     private CustomerManager customerManager;
-    private MainMenu mainMenu;
-    private boolean isPaused = false;
     private JButton[] kitchenAreaButtons;
     private JButton[] tableAreaButtons;
     private JTextArea gameChatArea;
@@ -31,19 +42,15 @@ public class GameScreen extends JFrame {
     private final Color darkBrown = new Color(139, 69, 19);
 
 
-    public GameScreen(GameLogic gameLogic, MainMenu mainMenu) {
-        this.gameLogic = gameLogic;
-        this.customerManager = gameLogic.getCustomerManager(); // Initialize CustomerManager from GameLogic
 
-
-
-        // Initialize TimeManager and start the timer
-        timeManager = gameLogic.getTimeManager();
-
-        this.mainMenu = mainMenu; // Initialize MainMenu reference
-        initUI();
-        startCustomerArrival();
+    public GameScreen(){
     }
+
+    public void initialize() {
+        initUI();
+    }
+
+
     private void initUI() {
 
         setTitle("Tropical Beach Dinner - Game Screen");
@@ -151,22 +158,9 @@ public class GameScreen extends JFrame {
 
     }
 
-    private void startCustomerArrival() {
-        System.out.println("In Start Customer");
-        customerTimer = new Timer();
-        customerTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (!isPaused) {
-                    System.out.println("In swing utilities Customer");
 
-                    SwingUtilities.invokeLater(() -> addCustomerToTable());
-                }
-            }
-        }, 0, 5000); // Customers arrive every 10 seconds
-    }
 
-    private void addCustomerToTable() {
+    public void addCustomerToTable() {
         System.out.println("In add Customer");
         Random random = new Random();
         for (int i = 0; i < tableAreaButtons.length; i++) {
@@ -209,6 +203,7 @@ public class GameScreen extends JFrame {
     private void returnMenuButtonClicked() {
         gameLogic.exitGame();
         dispose(); // Close the game screen
+        MainMenu mainMenu = new MainMenu();
         mainMenu.setVisible(true); // Show the main menu
     }
 
@@ -221,7 +216,7 @@ public class GameScreen extends JFrame {
         timeManager.resumeTimer();
         pauseButton.setText("Pause");
         pauseMenuPanel.setVisible(false);
-        isPaused = false;
+        timeManager.setPaused(false);
     }
 
     private static void quitButtonClicked() {
@@ -229,13 +224,13 @@ public class GameScreen extends JFrame {
     }
 
     private void pauseButtonClicked() {
-        if (isPaused) {
+        if (timeManager.isPaused()) {
             resumeButtonClicked();
         } else {
             timeManager.pauseTimer();
             pauseButton.setText("Resume");
             pauseMenuPanel.setVisible(true); // Show the pause menu
-            isPaused = true;
+            timeManager.setPaused(true);
         }
     }
 

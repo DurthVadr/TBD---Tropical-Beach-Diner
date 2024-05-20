@@ -1,8 +1,14 @@
 package GameEngine;
 
+import GUI.GameScreen;
+
+import javax.swing.*;
 import java.sql.Time;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameLogic {
+    private final GameScreen gameScreen;
     private CustomerManager customerManager;
     private InventoryManager inventoryManager;
 
@@ -26,16 +32,24 @@ public class GameLogic {
     private TimeManager timeManager;
 
     public GameLogic(CustomerManager customerManager, InventoryManager inventoryManager,
-                     RestaurantManager restaurantManager, TimeManager timeManager) {
+                     RestaurantManager restaurantManager, TimeManager timeManager, GameScreen gameScreen) {
         this.customerManager = customerManager;
         this.inventoryManager = inventoryManager;
         this.restaurantManager = restaurantManager;
         this.timeManager = timeManager;
+        this.gameScreen = gameScreen;
     }
 
     public void startNewGame() {
         // Placeholder for starting a new game
         System.out.println("New game started!");
+
+        gameScreen.setGameLogic(this);
+        gameScreen.setCustomerManager(this.customerManager);
+        gameScreen.setTimeManager(this.timeManager);
+        gameScreen.initialize();
+        gameScreen.setVisible(true);
+        startCustomerArrival();
     }
 
     //What are these and why they are here?
@@ -63,7 +77,21 @@ public class GameLogic {
         System.out.println("Game resumed!");
     }
 
-    
+
+    private void startCustomerArrival() {
+        System.out.println("In Start Customer");
+        Timer customerTimer = new Timer();
+        customerTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!timeManager.isPaused()) {
+                    System.out.println("In swing utilities Customer");
+
+                    SwingUtilities.invokeLater(() -> gameScreen.addCustomerToTable());
+                }
+            }
+        }, 0, 5000); // Customers arrive every 10 seconds
+    }
 
     
 //What are these and why they are here?
