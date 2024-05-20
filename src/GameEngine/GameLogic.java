@@ -58,17 +58,13 @@ public class GameLogic {
         startCustomerArrival();
     }
 
-    //What are these and why they are here?
-//<<<<<<< HEAD
+
     public void exitGame() {
         // Placeholder for starting a new game
         System.out.println("Game exited!");
     }
 
-//What are these and why they are here?
-//=======
-
-        private void startCustomerArrival() {
+    private void startCustomerArrival() {
         System.out.println("In Start Customer");
         Timer customerTimer = new Timer();
         Random random = new Random();
@@ -108,11 +104,7 @@ public class GameLogic {
 
     private void gaveOrder(Customer customer, int tableIndex) {
         Order order = customerManager.generateRandomOrder(customer);
-
         //JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
         gameScreen.orderGiven(customer,tableIndex,order);
     }
-
-//What are these and why they are here?
-// >>>>>>> b192ceb (Test Folder and example test and another logic starts)
 }

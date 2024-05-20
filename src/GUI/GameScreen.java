@@ -23,9 +23,11 @@ public class GameScreen extends JFrame {
     private JButton[] tableAreaButtons;
     private JTextArea gameChatArea;
 
-    private Timer customerTimer;
+    private CardLayout cardLayout;
+    private JPanel centerPanel;
+
     private JButton pauseButton;
-    private JPanel pauseMenuPanel;
+    private JPanel itemListPanel;
 
 
     public void setGameLogic(GameLogic gameLogic) {
@@ -35,9 +37,6 @@ public class GameScreen extends JFrame {
         this.restaurantManager=gameLogic.getRestaurantManager();
     }
 
-    public void setRestaurantManager(RestaurantManager restaurantManager) {
-        this.restaurantManager = restaurantManager;
-    }
     private final Color TABLE_EMPTY_COLOR = new Color(144, 238, 144);
     private final Color TABLE_THINKING_COLOR = new Color(255, 255, 109);
     private final Color TABLE_ORDERED_COLOR = new Color(0, 199, 255);
@@ -70,9 +69,9 @@ public class GameScreen extends JFrame {
         pauseButton = new JButton("Pause");
 
         // Initialize the pause menu panel
-        pauseMenuPanel = new JPanel();
+        JPanel pauseMenuPanel = new JPanel();
         pauseMenuPanel.setLayout(new BoxLayout(pauseMenuPanel, BoxLayout.Y_AXIS));
-        pauseMenuPanel.setVisible(false); // Initially hidden
+        //pauseMenuPanel.setVisible(false); // Initially hidden
 
         JButton resumeButton = new JButton("Resume");
         JButton saveButton = new JButton("Save");
@@ -124,6 +123,33 @@ public class GameScreen extends JFrame {
             tablePanel.add(tableAreaButtons[i]);
         }
 
+        // Initialize CardLayout and Center Panel
+        cardLayout = new CardLayout();
+        centerPanel = new JPanel(cardLayout);
+
+        // Stand panel setup
+        JPanel standPanel = new JPanel();
+        standPanel.setLayout(new BorderLayout());
+        standPanel.setPreferredSize(new Dimension(200, 250));
+
+        JLabel standLabel = new JLabel("Stand");
+        standLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        standPanel.add(standLabel, BorderLayout.NORTH);
+
+        itemListPanel = new JPanel();
+        itemListPanel.setLayout(new BoxLayout(itemListPanel, BoxLayout.Y_AXIS));
+        JScrollPane itemScrollPane = new JScrollPane(itemListPanel);
+        standPanel.add(itemScrollPane, BorderLayout.CENTER);
+
+        JButton returnButton = new JButton("Return");
+        returnButton.addActionListener(e -> removeItemFromStand());
+        standPanel.add(returnButton, BorderLayout.SOUTH);
+
+        // Add both panels to the centerPanel
+        centerPanel.add(standPanel, "StandPanel");
+        centerPanel.add(pauseMenuContainer, "PauseMenuPanel");
+
+
         // Game chat area setup
         gameChatArea = new JTextArea(5, 20);
         gameChatArea.setEditable(false);
@@ -138,21 +164,22 @@ public class GameScreen extends JFrame {
         saveButton.addActionListener(e -> saveButtonClicked());
         returnMenuButton.addActionListener(e -> returnMenuButtonClicked());
         quitButton.addActionListener(e -> quitButtonClicked());
-
         for (int i = 0; i < tableAreaButtons.length; i++) {
             JButton tableAreaButton = tableAreaButtons[i];
             tableAreaButton.addActionListener(e -> tableButtonClicked(tableAreaButton));
         }
+        for (int i = 0; i < kitchenAreaButtons.length; i++) {
+            JButton kitchenAreaButton = kitchenAreaButtons[i];
+            kitchenAreaButton.addActionListener(e -> kitchenAreaButtonClicked(kitchenAreaButton));
+        }
 
-
-
-        // Layout management
+// Layout management
         getContentPane().setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(kitchenPanel, BorderLayout.WEST);
         add(tablePanel, BorderLayout.EAST);
+        add(centerPanel, BorderLayout.CENTER);  // Add centerPanel to the CENTER
         add(scrollPane, BorderLayout.SOUTH);
-        add(pauseMenuContainer, BorderLayout.CENTER); // Add the pause menu container to the center
 
         // Ensure visibility and force repaint
         setVisible(true);
@@ -162,10 +189,31 @@ public class GameScreen extends JFrame {
 
     }
 
+    private void kitchenAreaButtonClicked(JButton kitchenAreaButton) {
+        addItemToStand(kitchenAreaButton.getText());  // Use the button's text as the item
+    }
+
+
+    private void addItemToStand(String item) {
+        JLabel itemLabel = new JLabel(item);
+        itemListPanel.add(itemLabel);
+        itemListPanel.revalidate();
+        itemListPanel.repaint();
+    }
+
+    private void removeItemFromStand() {
+        if (itemListPanel.getComponentCount() > 0) {
+            itemListPanel.remove(0);
+            itemListPanel.revalidate();
+            itemListPanel.repaint();
+        }
+    }
+
+
     private void tableButtonClicked(JButton tableAreaButton) {
 
         if (tableAreaButton.getBackground().equals(TABLE_EMPTY_COLOR)){
-            sendChatMessage("Table is empty");
+            sendChatMessage("Table is empty.\n");
         } else if (tableAreaButton.getBackground().equals(TABLE_THINKING_COLOR)) {
             String a="";
         }else if (tableAreaButton.getBackground().equals(TABLE_ORDERED_COLOR)) {
@@ -196,22 +244,17 @@ public class GameScreen extends JFrame {
         tableAreaButtons[tableIndex].setText(customer.getName() + " - " + orderMessage.toString());
     }
 
-    private void returnMenuButtonClicked() {
-        gameLogic.exitGame();
-        dispose(); // Close the game screen
-        MainMenu mainMenu = new MainMenu();
-        mainMenu.setVisible(true); // Show the main menu
-    }
 
     private void saveButtonClicked() {
         //A save system
     }
 
+
     private void resumeButtonClicked() {
-        //timeManager.resetTimer(); // Reset the timer to avoid multiple tasks running
         timeManager.resumeTimer();
         pauseButton.setText("Pause");
-        pauseMenuPanel.setVisible(false);
+        // Hide the pause menu and return to the stand panel
+        cardLayout.show(centerPanel, "StandPanel");
         timeManager.setPaused(false);
     }
 
@@ -225,11 +268,18 @@ public class GameScreen extends JFrame {
         } else {
             timeManager.pauseTimer();
             pauseButton.setText("Resume");
-            pauseMenuPanel.setVisible(true); // Show the pause menu
+            // Show the pause menu
+            cardLayout.show(centerPanel, "PauseMenuPanel");
             timeManager.setPaused(true);
         }
     }
 
+    private void returnMenuButtonClicked() {
+        gameLogic.exitGame();
+        dispose(); // Close the game screen
+        MainMenu mainMenu = new MainMenu();
+        mainMenu.setVisible(true); // Show the main menu
+    }
     private void sendChatMessage(String text){
         gameChatArea.append(text);
     }
