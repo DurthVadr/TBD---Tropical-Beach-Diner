@@ -2,9 +2,14 @@ package GUI;
 
 import GameEngine.GameLogic;
 import GameEngine.TimeManager;
+import Restaurant.Customer;
+import Restaurant.Order;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameScreen extends JFrame {
 
@@ -16,15 +21,19 @@ public class GameScreen extends JFrame {
     private JTextArea gameChatArea;
 
     private TimeManager timeManager;
-
+    private Timer customerTimer;
     private JButton pauseButton;
     private JPanel pauseMenuPanel;
+
+    private final Color lightBrown = new Color(205, 133, 63);
+    private final Color darkBrown = new Color(139, 69, 19);
 
 
     public GameScreen(GameLogic gameLogic, MainMenu mainMenu) {
         this.gameLogic = gameLogic;
         this.mainMenu = mainMenu; // Initialize MainMenu reference
         initUI();
+        startCustomerArrival();
     }
     private void initUI() {
 
@@ -133,6 +142,61 @@ public class GameScreen extends JFrame {
 
     }
 
+    private void startCustomerArrival() {
+        System.out.println("In Start Customer");
+        customerTimer = new Timer();
+        customerTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                if (!isPaused) {
+                    System.out.println("In swing utilities Customer");
+
+                    SwingUtilities.invokeLater(() -> addCustomerToTable());
+                }
+            }
+        }, 0, 5000); // Customers arrive every 10 seconds
+    }
+
+    private void addCustomerToTable() {
+        System.out.println("In add Customer");
+        Random random = new Random();
+        for (int i = 0; i < tableAreaButtons.length; i++) {
+            JButton tableButton = tableAreaButtons[i];
+            System.out.println("In Start Customer");
+            if (tableButton.getBackground().equals(lightBrown)) {
+                System.out.println("In Start Customerrr if statement");
+                int customerCount = random.nextInt(4) + 1; // 1 to 4 customers
+                Customer customer = new Customer("Table " + (i + 1) + " - Customers: " + customerCount, 1.0f);
+                tableButton.setBackground(darkBrown);
+                tableButton.setText(customer.getName());
+                System.out.println("WOWWWW");
+                gameChatArea.append(customer.getName() + " have arrived.\n");
+                int tableIndex = i; // final or effectively final for use in inner class
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        SwingUtilities.invokeLater(() -> showCustomerOrder(customer, tableIndex));
+                    }
+                }, 10000); // 10 seconds delay for customers to think
+                return;
+            }
+        }
+        gameChatArea.append("All tables are full!\n");
+    }
+
+    private void showCustomerOrder(Customer customer, int tableIndex) {
+    Order order = customer.generateRandomOrder();
+    System.out.println("Got in order part");
+    StringBuilder orderMessage = new StringBuilder("Order: ");
+    for (String item : order.getItems()) {
+        System.out.println("Showing order message");
+        orderMessage.append(item).append(" ");
+    }
+    JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
+    gameChatArea.append(orderMessage.toString() + " at " + customer.getName() + "\n");
+    tableAreaButtons[tableIndex].setText(customer.getName() + " - " + orderMessage.toString());
+}
+
     private void returnMenuButtonClicked() {
         gameLogic.exitGame();
         dispose(); // Close the game screen
@@ -175,5 +239,5 @@ public class GameScreen extends JFrame {
     public void displayMessage(String message) {
         gameChatArea.append(message + "\n");
     }
-
+    
 }
