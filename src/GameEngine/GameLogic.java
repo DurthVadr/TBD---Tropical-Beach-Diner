@@ -17,4 +17,8 @@ public class GameLogic {
         // Placeholder for starting a new game
         System.out.println("New game started!");
     }
+    public void exitGame() {
+        // Placeholder for starting a new game
+        System.out.println("Game exited!");
+    }
 }
