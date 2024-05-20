@@ -71,7 +71,7 @@ public class GameScreen extends JFrame {
         // Initialize the pause menu panel
         JPanel pauseMenuPanel = new JPanel();
         pauseMenuPanel.setLayout(new BoxLayout(pauseMenuPanel, BoxLayout.Y_AXIS));
-        //pauseMenuPanel.setVisible(false); // Initially hidden
+
 
         JButton resumeButton = new JButton("Resume");
         JButton saveButton = new JButton("Save");
@@ -141,9 +141,23 @@ public class GameScreen extends JFrame {
         JScrollPane itemScrollPane = new JScrollPane(itemListPanel);
         standPanel.add(itemScrollPane, BorderLayout.CENTER);
 
+        // Create a panel for the buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        JButton inventoryButton = new JButton("Inventory");
         JButton returnButton = new JButton("Return");
-        returnButton.addActionListener(e -> removeItemFromStand());
-        standPanel.add(returnButton, BorderLayout.SOUTH);
+        JButton serveButton = new JButton("Serve");
+        JButton trashButton = new JButton("Trash");
+
+
+        // Add buttons to the button panel
+        buttonPanel.add(inventoryButton);
+        buttonPanel.add(returnButton);
+        buttonPanel.add(serveButton);
+        buttonPanel.add(trashButton);
+
+        // Add the button panel to the standPanel at the SOUTH position
+        standPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         // Add both panels to the centerPanel
         centerPanel.add(standPanel, "StandPanel");
@@ -172,6 +186,11 @@ public class GameScreen extends JFrame {
             JButton kitchenAreaButton = kitchenAreaButtons[i];
             kitchenAreaButton.addActionListener(e -> kitchenAreaButtonClicked(kitchenAreaButton));
         }
+        inventoryButton.addActionListener(e -> inventoryButtonClicked());
+        returnButton.addActionListener(e -> returnButtonClicked());
+        serveButton.addActionListener(e -> serveButtonClicked());
+        trashButton.addActionListener(e -> trashButtonClicked());
+
 
 // Layout management
         getContentPane().setLayout(new BorderLayout());
@@ -189,6 +208,17 @@ public class GameScreen extends JFrame {
 
     }
 
+    private void trashButtonClicked() {
+    }
+
+    private void serveButtonClicked() {
+    }
+
+
+    private void inventoryButtonClicked() {
+        
+    }
+
     private void kitchenAreaButtonClicked(JButton kitchenAreaButton) {
         addItemToStand(kitchenAreaButton.getText());  // Use the button's text as the item
     }
@@ -201,7 +231,7 @@ public class GameScreen extends JFrame {
         itemListPanel.repaint();
     }
 
-    private void removeItemFromStand() {
+    private void returnButtonClicked() {
         if (itemListPanel.getComponentCount() > 0) {
             itemListPanel.remove(0);
             itemListPanel.revalidate();
