@@ -18,10 +18,6 @@ public class TimeManager {
     private JLabel timerLabel;
     private TimerTask timerTask;
 
-    public TimeManager(JLabel timerLabel) {
-        this.timerLabel = timerLabel;
-    }
-
     public TimeManager() {
     }
 

@@ -2,6 +2,7 @@ package GUI;
 
 import GameEngine.CustomerManager;
 import GameEngine.GameLogic;
+import GameEngine.RestaurantManager;
 import GameEngine.TimeManager;
 import Restaurant.Customer;
 import Restaurant.Order;
@@ -9,38 +10,40 @@ import Restaurant.Order;
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.Timer;
 
 public class GameScreen extends JFrame {
 
-
-    public void setGameLogic(GameLogic gameLogic) {
-        this.gameLogic = gameLogic;
-    }
-
     private GameLogic gameLogic;
-
-    public void setCustomerManager(CustomerManager customerManager) {
-        this.customerManager = customerManager;
-    }
-
-    public void setTimeManager(TimeManager timeManager) {
-        this.timeManager = timeManager;
-    }
-
+    private TimeManager timeManager;
     private CustomerManager customerManager;
+
+    private RestaurantManager restaurantManager;
     private JButton[] kitchenAreaButtons;
     private JButton[] tableAreaButtons;
     private JTextArea gameChatArea;
 
-    private TimeManager timeManager;
     private Timer customerTimer;
     private JButton pauseButton;
     private JPanel pauseMenuPanel;
 
-    private final Color lightBrown = new Color(205, 133, 63);
-    private final Color darkBrown = new Color(139, 69, 19);
+
+    public void setGameLogic(GameLogic gameLogic) {
+        this.gameLogic = gameLogic;
+        this.customerManager = gameLogic.getCustomerManager();
+        this.timeManager=gameLogic.getTimeManager();
+        this.restaurantManager=gameLogic.getRestaurantManager();
+    }
+
+    public void setRestaurantManager(RestaurantManager restaurantManager) {
+        this.restaurantManager = restaurantManager;
+    }
+    private final Color TABLE_EMPTY_COLOR = new Color(144, 238, 144);
+    private final Color TABLE_THINKING_COLOR = new Color(255, 255, 109);
+    private final Color TABLE_ORDERED_COLOR = new Color(0, 199, 255);
+    private final Color TABLE_EATING_COLOR = new Color(255, 255, 30);
+    private final Color TABLE_WAITING_TO_LEAVE_COLOR = new Color(70, 255, 46);
+
 
 
 
@@ -97,11 +100,6 @@ public class GameScreen extends JFrame {
         timeManager.setTimerLabel(timerLabel);
         timeManager.startTimer(300);
 
-
-        // Color definition
-        Color lightBrown = new Color(205, 133, 63); // This is a light brown color (RGB)
-
-
         // Kitchen area setup
         JPanel kitchenPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         kitchenPanel.setPreferredSize(new Dimension(300, 250));  // Set preferred size to control expansion
@@ -118,7 +116,7 @@ public class GameScreen extends JFrame {
         tableAreaButtons = new JButton[6];
         for (int i = 0; i < tableAreaButtons.length; i++) {
             tableAreaButtons[i] = new JButton("Table " + (i + 1));
-            tableAreaButtons[i].setBackground(lightBrown);
+            tableAreaButtons[i].setBackground(TABLE_EMPTY_COLOR);
             tableAreaButtons[i].setOpaque(true);
             tableAreaButtons[i].setBorderPainted(false);
             tableAreaButtons[i].setPreferredSize(new Dimension(100, 50));  // Ensure buttons are not oversized
@@ -140,6 +138,12 @@ public class GameScreen extends JFrame {
         returnMenuButton.addActionListener(e -> returnMenuButtonClicked());
         quitButton.addActionListener(e -> quitButtonClicked());
 
+        for (int i = 0; i < tableAreaButtons.length; i++) {
+            JButton tableAreaButton = tableAreaButtons[i];
+            tableAreaButton.addActionListener(e -> tableButtonClicked(tableAreaButton));
+        }
+
+
 
         // Layout management
         getContentPane().setLayout(new BorderLayout());
@@ -157,11 +161,27 @@ public class GameScreen extends JFrame {
 
     }
 
+    private void tableButtonClicked(JButton tableAreaButton) {
+
+        if (tableAreaButton.getBackground().equals(TABLE_EMPTY_COLOR)){
+            sendChatMessage("Table is empty");
+        } else if (tableAreaButton.getBackground().equals(TABLE_THINKING_COLOR)) {
+            String a="";
+        }else if (tableAreaButton.getBackground().equals(TABLE_ORDERED_COLOR)) {
+            String a="";
+        }else if (tableAreaButton.getBackground().equals(TABLE_EATING_COLOR)) {
+            String a="";
+        }else if (tableAreaButton.getBackground().equals(TABLE_WAITING_TO_LEAVE_COLOR)) {
+            String a="";
+        }
+
+    }
+
     public void addCustomerToTable(Customer customer, int tableIndex) {
         JButton tableButton = tableAreaButtons[tableIndex];
-        tableButton.setBackground(darkBrown);
+        tableButton.setBackground(TABLE_THINKING_COLOR);
         tableButton.setText(customer.getName());
-        gameChatArea.append(customer.getName() + " have arrived.\n");
+        sendChatMessage(customer.getName() + " have arrived.\n");
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -179,16 +199,6 @@ public class GameScreen extends JFrame {
         JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
         gameChatArea.append(orderMessage.toString() + " at " + customer.getName() + "\n");
         tableAreaButtons[tableIndex].setText(customer.getName() + " - " + orderMessage.toString());
-    }
-
-
-    public int findAvailableTable() {
-        for (int i = 0; i < tableAreaButtons.length; i++) {
-            if (tableAreaButtons[i].getBackground().equals(lightBrown)) {
-                return i;
-            }
-        }
-        return -1; // No available table
     }
 
     private void returnMenuButtonClicked() {
@@ -223,6 +233,10 @@ public class GameScreen extends JFrame {
             pauseMenuPanel.setVisible(true); // Show the pause menu
             timeManager.setPaused(true);
         }
+    }
+
+    private void sendChatMessage(String text){
+        gameChatArea.append(text);
     }
 
     public JButton[] getKitchenAreaButtons() {

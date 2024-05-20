@@ -9,6 +9,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class GameLogic {
+
     private final GameScreen gameScreen;
     private final CustomerManager customerManager;
     private final InventoryManager inventoryManager;
@@ -31,6 +32,10 @@ public class GameLogic {
         return timeManager;
     }
 
+    public GameScreen getGameScreen() {
+        return gameScreen;
+    }
+
     public GameLogic(CustomerManager customerManager, InventoryManager inventoryManager,
                      RestaurantManager restaurantManager, TimeManager timeManager, GameScreen gameScreen) {
         this.customerManager = customerManager;
@@ -44,8 +49,8 @@ public class GameLogic {
         // Placeholder for starting a new game
         System.out.println("New game started!");
         gameScreen.setGameLogic(this);
-        gameScreen.setCustomerManager(this.customerManager);
-        gameScreen.setTimeManager(this.timeManager);
+        restaurantManager.setGameLogic(this);
+
         gameScreen.initialize();
         gameScreen.setVisible(true);
         startCustomerArrival();
@@ -69,10 +74,11 @@ public class GameLogic {
             public void run() {
                 if (!timeManager.isPaused()) {
                     SwingUtilities.invokeLater(() -> {
-                        int tableIndex = gameScreen.findAvailableTable();
+                        int tableIndex = restaurantManager.findAvailableTable();
+                        System.out.println("Tesst");
                         if (tableIndex != -1) {
                             Customer customer = customerManager.createCustomer(tableIndex);
-                            gameScreen.addCustomerToTable(customer, tableIndex);
+                            restaurantManager.addCustomerToTable(tableIndex,customer);
                         }
                     });
                 }
