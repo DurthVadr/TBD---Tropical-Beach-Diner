@@ -106,6 +106,7 @@ public class MainMenu extends JFrame {
             gameLogic.loadGame(saveLoadSystem.getLoadedGameState());
         } else {
             JOptionPane.showMessageDialog(this, "No saved game found!", "Error", JOptionPane.ERROR_MESSAGE);
+
         }
     }
 
