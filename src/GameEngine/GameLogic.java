@@ -1,6 +1,7 @@
 package GameEngine;
 
 import GUI.GameScreen;
+import Restaurant.Customer;
 
 import javax.swing.*;
 import java.sql.Time;
@@ -9,8 +10,10 @@ import java.util.TimerTask;
 
 public class GameLogic {
     private final GameScreen gameScreen;
-    private CustomerManager customerManager;
-    private InventoryManager inventoryManager;
+    private final CustomerManager customerManager;
+    private final InventoryManager inventoryManager;
+    private final RestaurantManager restaurantManager;
+    private final TimeManager timeManager;
 
     public CustomerManager getCustomerManager() {
         return customerManager;
@@ -28,9 +31,6 @@ public class GameLogic {
         return timeManager;
     }
 
-    private RestaurantManager restaurantManager;
-    private TimeManager timeManager;
-
     public GameLogic(CustomerManager customerManager, InventoryManager inventoryManager,
                      RestaurantManager restaurantManager, TimeManager timeManager, GameScreen gameScreen) {
         this.customerManager = customerManager;
@@ -43,7 +43,6 @@ public class GameLogic {
     public void startNewGame() {
         // Placeholder for starting a new game
         System.out.println("New game started!");
-
         gameScreen.setGameLogic(this);
         gameScreen.setCustomerManager(this.customerManager);
         gameScreen.setTimeManager(this.timeManager);
@@ -62,22 +61,6 @@ public class GameLogic {
 //What are these and why they are here?
 //=======
 
-    public void endGame() {
-        // Placeholder for ending a game
-        System.out.println("Game ended!");
-    }
-
-    public void pauseGame() {
-        // Placeholder for pausing a game
-        System.out.println("Game paused!");
-    }
-
-    public void resumeGame() {
-        // Placeholder for resuming a game
-        System.out.println("Game resumed!");
-    }
-
-
     private void startCustomerArrival() {
         System.out.println("In Start Customer");
         Timer customerTimer = new Timer();
@@ -85,12 +68,16 @@ public class GameLogic {
             @Override
             public void run() {
                 if (!timeManager.isPaused()) {
-                    System.out.println("In swing utilities Customer");
-
-                    SwingUtilities.invokeLater(() -> gameScreen.addCustomerToTable());
+                    SwingUtilities.invokeLater(() -> {
+                        int tableIndex = gameScreen.findAvailableTable();
+                        if (tableIndex != -1) {
+                            Customer customer = customerManager.createCustomer(tableIndex);
+                            gameScreen.addCustomerToTable(customer, tableIndex);
+                        }
+                    });
                 }
             }
-        }, 0, 5000); // Customers arrive every 10 seconds
+        }, 0, 1000); // Customers arrive every 5 seconds
     }
 
     
