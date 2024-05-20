@@ -5,6 +5,7 @@ import Restaurant.Customer;
 
 import javax.swing.*;
 import java.sql.Time;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -64,7 +65,8 @@ public class GameLogic {
     private void startCustomerArrival() {
         System.out.println("In Start Customer");
         Timer customerTimer = new Timer();
-        customerTimer.scheduleAtFixedRate(new TimerTask() {
+        Random random = new Random();
+        TimerTask task = new TimerTask() {
             @Override
             public void run() {
                 if (!timeManager.isPaused()) {
@@ -75,11 +77,19 @@ public class GameLogic {
                             gameScreen.addCustomerToTable(customer, tableIndex);
                         }
                     });
+                    // Schedule the next customer
+                    int delay = (random.nextInt(6) + 5) * 1000;  // Random delay between 5 and 10 seconds
+                    customerTimer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            startCustomerArrival();
+                        }
+                    }, delay);
                 }
             }
-        }, 0, 1000); // Customers arrive every 5 seconds
+        };
+        task.run();  // Start the first customer
     }
-
     
 //What are these and why they are here?
 // >>>>>>> b192ceb (Test Folder and example test and another logic starts)
