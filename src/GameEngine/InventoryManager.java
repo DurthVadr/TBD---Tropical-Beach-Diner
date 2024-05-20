@@ -1,5 +1,7 @@
 package GameEngine;
 
+import Restaurant.Item;
+
 public class InventoryManager {
 
     public void addItem(Item item) {

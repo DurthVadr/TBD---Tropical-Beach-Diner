@@ -1,5 +1,7 @@
 package GameEngine;
 
+import Restaurant.Customer;
+
 public class CustomerManager {
 
     public void addCustomer(Customer customer) {
@@ -11,7 +13,5 @@ public class CustomerManager {
         // Placeholder for removing a customer
         System.out.println("Customer removed!");
     }
-
-    
 
 }
