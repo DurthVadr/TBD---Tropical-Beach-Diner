@@ -2,6 +2,7 @@ package GameEngine;
 
 import GUI.GameScreen;
 import Restaurant.Customer;
+import Restaurant.Order;
 
 import javax.swing.*;
 import java.sql.Time;
@@ -75,7 +76,6 @@ public class GameLogic {
                 if (!timeManager.isPaused()) {
                     SwingUtilities.invokeLater(() -> {
                         int tableIndex = restaurantManager.findAvailableTable();
-                        System.out.println("Tesst");
                         if (tableIndex != -1) {
                             Customer customer = customerManager.createCustomer(tableIndex);
                             restaurantManager.addCustomerToTable(tableIndex,customer);
@@ -86,7 +86,22 @@ public class GameLogic {
         }, 0, 1000); // Customers arrive every 5 seconds
     }
 
-    
+    public void scheduleCustomerOrder(Customer customer, int tableIndex) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                SwingUtilities.invokeLater(() -> gaveOrder(customer, tableIndex));
+            }
+        }, 10000); // 10 seconds delay for customers to think
+    }
+
+    private void gaveOrder(Customer customer, int tableIndex) {
+        Order order = customerManager.generateRandomOrder(customer);
+
+        //JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
+        gameScreen.orderGiven(customer,tableIndex,order);
+    }
+
 //What are these and why they are here?
 // >>>>>>> b192ceb (Test Folder and example test and another logic starts)
 }

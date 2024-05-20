@@ -182,22 +182,16 @@ public class GameScreen extends JFrame {
         tableButton.setBackground(TABLE_THINKING_COLOR);
         tableButton.setText(customer.getName());
         sendChatMessage(customer.getName() + " have arrived.\n");
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                SwingUtilities.invokeLater(() -> showCustomerOrder(customer, tableIndex));
-            }
-        }, 10000); // 10 seconds delay for customers to think
     }
 
-    private void showCustomerOrder(Customer customer, int tableIndex) {
-        Order order = customerManager.generateRandomOrder(customer);
+    public void orderGiven(Customer customer, int tableIndex, Order order) {
         StringBuilder orderMessage = new StringBuilder("Order: ");
         for (String item : order.getItems()) {
             orderMessage.append(item).append(" ");
         }
         JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
-        gameChatArea.append(orderMessage.toString() + " at " + customer.getName() + "\n");
+        orderMessage= new StringBuilder(orderMessage.toString() + " at " + customer.getName() + "\n");
+        sendChatMessage(orderMessage.toString());
         tableAreaButtons[tableIndex].setText(customer.getName() + " - " + orderMessage.toString());
     }
 
