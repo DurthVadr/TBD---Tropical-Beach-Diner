@@ -83,7 +83,7 @@ public class MainMenu extends JFrame {
     private void startGameButtonClicked() {
         gameLogic.startNewGame();
         dispose();
-        new GameScreen(gameLogic).setVisible(true);
+        new GameScreen(gameLogic, this).setVisible(true); // Pass MainMenu reference
     }
 
     private void loadGameButtonClicked() {

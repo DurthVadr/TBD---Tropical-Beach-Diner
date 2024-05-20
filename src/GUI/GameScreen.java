@@ -7,23 +7,27 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GameScreen extends JFrame {
+
     private GameLogic gameLogic;
+    private MainMenu mainMenu;
+    private boolean isPaused = false;
     private JButton[] kitchenAreaButtons;
     private JButton[] tableAreaButtons;
     private JTextArea gameChatArea;
 
     private TimeManager timeManager;
-    private JLabel timerLabel;
-    private JLabel satisfactionLabel;
-    private JLabel moneyLabel;
+
+    private JButton pauseButton;
+    private JPanel pauseMenuPanel;
 
 
-    public GameScreen(GameLogic gameLogic) {
+    public GameScreen(GameLogic gameLogic, MainMenu mainMenu) {
         this.gameLogic = gameLogic;
+        this.mainMenu = mainMenu; // Initialize MainMenu reference
         initUI();
     }
-
     private void initUI() {
+
         setTitle("Tropical Beach Dinner - Game Screen");
         setSize(1280, 720);  // Adjust size for better control over layout
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -31,13 +35,35 @@ public class GameScreen extends JFrame {
         setResizable(false);
 
         // Initialize labels
-        timerLabel = new JLabel("Time: 05:00");
-        satisfactionLabel = new JLabel("Satisfaction: 100%");
-        moneyLabel = new JLabel("Money: $0");
+        JLabel timerLabel = new JLabel("Time: 05:00");
+        JLabel satisfactionLabel = new JLabel("Satisfaction: 100%");
+        JLabel moneyLabel = new JLabel("Money: $0");
+
+        // Initialize the pause button
+        pauseButton = new JButton("Pause");
+
+        // Initialize the pause menu panel
+        pauseMenuPanel = new JPanel();
+        pauseMenuPanel.setLayout(new BoxLayout(pauseMenuPanel, BoxLayout.Y_AXIS));
+        pauseMenuPanel.setVisible(false); // Initially hidden
+
+        JButton resumeButton = new JButton("Resume");
+        JButton saveButton = new JButton("Save");
+        JButton returnMenuButton = new JButton("Menu");
+        JButton quitButton = new JButton("Quit");
+        pauseMenuPanel.add(resumeButton);
+        pauseMenuPanel.add(saveButton);
+        pauseMenuPanel.add(returnMenuButton);
+        pauseMenuPanel.add(quitButton);
+
+        // Center the pause menu in the frame
+        JPanel pauseMenuContainer = new JPanel(new GridBagLayout());
+        pauseMenuContainer.add(pauseMenuPanel);
 
         // Top panel for timer, satisfaction, and money labels
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
+        topPanel.add(pauseButton); // Add the pause button to the top panel
         topPanel.add(timerLabel);
         topPanel.add(satisfactionLabel);
         topPanel.add(moneyLabel);
@@ -82,12 +108,60 @@ public class GameScreen extends JFrame {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setPreferredSize(new Dimension(600, 200));  // Control height of the chat area
 
+
+        // Add action listeners
+        pauseButton.addActionListener(e -> pauseButtonClicked());
+        resumeButton.addActionListener(e -> resumeButtonClicked());
+        saveButton.addActionListener(e -> saveButtonClicked());
+        returnMenuButton.addActionListener(e -> returnMenuButtonClicked());
+        quitButton.addActionListener(e -> quitButtonClicked());
+
+
         // Layout management
         getContentPane().setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(kitchenPanel, BorderLayout.WEST);
         add(tablePanel, BorderLayout.EAST);
         add(scrollPane, BorderLayout.SOUTH);
+        add(pauseMenuContainer, BorderLayout.CENTER); // Add the pause menu container to the center
+
+        // Ensure visibility and force repaint
+        setVisible(true);
+        revalidate();
+        repaint();
+
+
+    }
+
+    private void returnMenuButtonClicked() {
+        gameLogic.exitGame();
+        dispose(); // Close the game screen
+        mainMenu.setVisible(true); // Show the main menu
+    }
+
+    private void saveButtonClicked() {
+        //A save system
+    }
+
+    private void resumeButtonClicked() {
+        timeManager.resumeTimer();
+        pauseButton.setText("Pause");
+        pauseMenuPanel.setVisible(false);
+    }
+
+    private static void quitButtonClicked() {
+        System.exit(0);
+    }
+
+    private void pauseButtonClicked() {
+        if (isPaused) {
+            resumeButtonClicked();
+        } else {
+            timeManager.pauseTimer();
+            pauseButton.setText("Resume");
+            pauseMenuPanel.setVisible(true); // Show the pause menu
+        }
+        isPaused = !isPaused;
     }
 
     public JButton[] getKitchenAreaButtons() {
