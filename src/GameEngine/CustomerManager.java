@@ -55,4 +55,11 @@ public class CustomerManager {
         return total;
     }
 
+
+    public Customer createCustomer(int tableIndex) {
+        int customerCount = new Random().nextInt(4) + 1; // 1 to 4 customers
+        return new Customer("C" + (tableIndex + 1), 1.0f);
+    }
+
+
 }
