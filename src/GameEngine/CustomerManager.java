@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 public class CustomerManager {
-    private static final List<String> MENU_ITEMS = Arrays.asList("Burger", "Pasta", "Salad", "Pizza", "Soup");
+    private static final List<String> MENU_ITEMS = Arrays.asList("Burger", "Cheeseburger", "Salad", "Pizza", "Vegan Pizza");
     private static final List<Float> ITEM_PRICES = Arrays.asList(10.0f, 12.0f, 8.0f, 15.0f, 7.0f);
 
     public void addCustomer(Customer customer) {
@@ -24,11 +24,8 @@ public class CustomerManager {
     public Order generateRandomOrder(Customer customer) {
         Random random = new Random();
         Order order = new Order(customer);
-        int itemsCount = random.nextInt(3) + 1; // 1 to 3 items
-        for (int i = 0; i < itemsCount; i++) {
-            int itemIndex = random.nextInt(MENU_ITEMS.size());
-            order.addItem(MENU_ITEMS.get(itemIndex), ITEM_PRICES.get(itemIndex));
-        }
+        int itemIndex = random.nextInt(MENU_ITEMS.size());
+        order.addItem(MENU_ITEMS.get(itemIndex), ITEM_PRICES.get(itemIndex));
         return order;
     }
 
@@ -55,11 +52,9 @@ public class CustomerManager {
         return total;
     }
 
-
     public Customer createCustomer(int tableIndex) {
         int customerCount = new Random().nextInt(4) + 1; // 1 to 4 customers
         return new Customer("C" + (tableIndex + 1), 1.0f);
     }
-
 
 }
