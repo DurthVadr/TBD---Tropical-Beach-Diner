@@ -1,12 +1,11 @@
 package GUI;
 
-import GameEngine.GameLogic;
+import GameEngine.*;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MainMenu extends JFrame {
-    private GameLogic gameLogic;
     private JLabel titleLabel;
     private JButton startGameButton;
     private JButton loadGameButton;
@@ -14,8 +13,7 @@ public class MainMenu extends JFrame {
     private JButton exitGameButton;
 
 
-    public MainMenu(GameLogic gameLogic) {
-        this.gameLogic = gameLogic;
+    public MainMenu() {
         initUI();
     }
 
@@ -81,6 +79,18 @@ public class MainMenu extends JFrame {
     }
 
     private void startGameButtonClicked() {
+
+        // Initialize the game components
+        CustomerManager customerManager = new CustomerManager();
+        InventoryManager inventoryManager = new InventoryManager();
+        RestaurantManager restaurantManager = new RestaurantManager();
+        TimeManager timeManager = new TimeManager();
+
+
+        // Initialize the game logic
+        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager);
+
+
         gameLogic.startNewGame();
         dispose();
         new GameScreen(gameLogic, this).setVisible(true); // Pass MainMenu reference
@@ -99,6 +109,8 @@ public class MainMenu extends JFrame {
     }
 
     public JButton getStartGameButton() {
+
+
         return startGameButton;
     }
 

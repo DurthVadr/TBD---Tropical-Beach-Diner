@@ -1,5 +1,6 @@
 package GUI;
 
+import GameEngine.CustomerManager;
 import GameEngine.GameLogic;
 import GameEngine.TimeManager;
 import Restaurant.Customer;
@@ -14,6 +15,7 @@ import java.util.TimerTask;
 public class GameScreen extends JFrame {
 
     private GameLogic gameLogic;
+    private CustomerManager customerManager;
     private MainMenu mainMenu;
     private boolean isPaused = false;
     private JButton[] kitchenAreaButtons;
@@ -31,6 +33,13 @@ public class GameScreen extends JFrame {
 
     public GameScreen(GameLogic gameLogic, MainMenu mainMenu) {
         this.gameLogic = gameLogic;
+        this.customerManager = gameLogic.getCustomerManager(); // Initialize CustomerManager from GameLogic
+
+
+
+        // Initialize TimeManager and start the timer
+        timeManager = gameLogic.getTimeManager();
+
         this.mainMenu = mainMenu; // Initialize MainMenu reference
         initUI();
         startCustomerArrival();
@@ -79,7 +88,7 @@ public class GameScreen extends JFrame {
         add(topPanel, BorderLayout.NORTH);
 
         // Initialize TimeManager and start the timer
-        timeManager = new TimeManager(timerLabel);
+        timeManager.setTimerLabel(timerLabel);
         timeManager.startTimer(300);
 
 
@@ -185,7 +194,7 @@ public class GameScreen extends JFrame {
     }
 
     private void showCustomerOrder(Customer customer, int tableIndex) {
-    Order order = customer.generateRandomOrder();
+    Order order = customerManager.generateRandomOrder(customer);
     System.out.println("Got in order part");
     StringBuilder orderMessage = new StringBuilder("Order: ");
     for (String item : order.getItems()) {
