@@ -92,8 +92,22 @@ public class MainMenu extends JFrame {
         gameLogic.startNewGame();
     }
 
-    private void loadGameButtonClicked() {
-        // Handle load game button action
+    private void loadGameButtonClicked() { //need to be checked
+        SaveLoadSystem saveLoadSystem = new SaveLoadSystem();
+        if (saveLoadSystem.loadGame()) {
+            CustomerManager customerManager = new CustomerManager();
+            InventoryManager inventoryManager = new InventoryManager();
+            RestaurantManager restaurantManager = new RestaurantManager();
+            TimeManager timeManager = new TimeManager();
+            GameScreen gameScreen = new GameScreen();
+
+            GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
+            dispose();
+            gameLogic.loadGame(saveLoadSystem.getLoadedGameState());
+        } else {
+            JOptionPane.showMessageDialog(this, "No saved game found!", "Error", JOptionPane.ERROR_MESSAGE);
+
+        }
     }
 
     private void optionsButtonClicked() {

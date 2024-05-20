@@ -104,11 +104,12 @@ public class GameScreen extends JFrame {
         JPanel kitchenPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         kitchenPanel.setPreferredSize(new Dimension(300, 250));  // Set preferred size to control expansion
         kitchenAreaButtons = new JButton[6];
+        String[] buttonNames = {"Meat", "Cheese", "Lettuce", "Tomato", "Dough", "Pepperoni"};  // Button names
         for (int i = 0; i < kitchenAreaButtons.length; i++) {
-            kitchenAreaButtons[i] = new JButton("ING " + (i + 1));
-            kitchenAreaButtons[i].setPreferredSize(new Dimension(100, 50));  // Set preferred button size
+            kitchenAreaButtons[i] = new JButton(buttonNames[i]);
             kitchenPanel.add(kitchenAreaButtons[i]);
         }
+            
 
         // Restaurant area setup
         JPanel tablePanel = new JPanel(new GridLayout(3, 2, 10, 10));
