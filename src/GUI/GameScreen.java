@@ -1,42 +1,59 @@
 package GUI;
 
+import GameEngine.CustomerManager;
 import GameEngine.GameLogic;
+import GameEngine.RestaurantManager;
 import GameEngine.TimeManager;
 import Restaurant.Customer;
 import Restaurant.Order;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Random;
+import java.util.*;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class GameScreen extends JFrame {
 
     private GameLogic gameLogic;
-    private MainMenu mainMenu;
-    private boolean isPaused = false;
+    private TimeManager timeManager;
+    private CustomerManager customerManager;
+
+    private RestaurantManager restaurantManager;
     private JButton[] kitchenAreaButtons;
     private JButton[] tableAreaButtons;
     private JTextArea gameChatArea;
 
-    private TimeManager timeManager;
-    private Timer customerTimer;
+    private CardLayout cardLayout;
+    private JPanel centerPanel;
+
     private JButton pauseButton;
-    private JPanel pauseMenuPanel;
-
-    private final Color lightBrown = new Color(205, 133, 63);
-    private final Color darkBrown = new Color(139, 69, 19);
+    private JPanel itemListPanel;
 
 
-    public GameScreen(GameLogic gameLogic, MainMenu mainMenu) {
+    public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
-        this.mainMenu = mainMenu; // Initialize MainMenu reference
-        initUI();
-        startCustomerArrival();
+        this.customerManager = gameLogic.getCustomerManager();
+        this.timeManager=gameLogic.getTimeManager();
+        this.restaurantManager=gameLogic.getRestaurantManager();
     }
-    private void initUI() {
 
+    private final Color TABLE_EMPTY_COLOR = new Color(144, 238, 144);
+    private final Color TABLE_THINKING_COLOR = new Color(255, 255, 109);
+    private final Color TABLE_ORDERED_COLOR = new Color(0, 199, 255);
+    private final Color TABLE_EATING_COLOR = new Color(255, 255, 30);
+    private final Color TABLE_WAITING_TO_LEAVE_COLOR = new Color(70, 255, 46);
+
+
+
+
+    public GameScreen(){
+    }
+
+    public void initialize() {
+        initUI();
+    }
+
+    private void initUI() {
         setTitle("Tropical Beach Dinner - Game Screen");
         setSize(1280, 720);  // Adjust size for better control over layout
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -52,9 +69,9 @@ public class GameScreen extends JFrame {
         pauseButton = new JButton("Pause");
 
         // Initialize the pause menu panel
-        pauseMenuPanel = new JPanel();
+        JPanel pauseMenuPanel = new JPanel();
         pauseMenuPanel.setLayout(new BoxLayout(pauseMenuPanel, BoxLayout.Y_AXIS));
-        pauseMenuPanel.setVisible(false); // Initially hidden
+
 
         JButton resumeButton = new JButton("Resume");
         JButton saveButton = new JButton("Save");
@@ -79,23 +96,19 @@ public class GameScreen extends JFrame {
         add(topPanel, BorderLayout.NORTH);
 
         // Initialize TimeManager and start the timer
-        timeManager = new TimeManager(timerLabel);
+        timeManager.setTimerLabel(timerLabel);
         timeManager.startTimer(300);
-
-
-        // Color definition
-        Color lightBrown = new Color(205, 133, 63); // This is a light brown color (RGB)
-
 
         // Kitchen area setup
         JPanel kitchenPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         kitchenPanel.setPreferredSize(new Dimension(300, 250));  // Set preferred size to control expansion
         kitchenAreaButtons = new JButton[6];
+        String[] buttonNames = {"Meat", "Cheese", "Lettuce", "Tomato", "Dough", "Pepperoni"};  // Button names
         for (int i = 0; i < kitchenAreaButtons.length; i++) {
-            kitchenAreaButtons[i] = new JButton("ING " + (i + 1));
-            kitchenAreaButtons[i].setPreferredSize(new Dimension(100, 50));  // Set preferred button size
+            kitchenAreaButtons[i] = new JButton(buttonNames[i]);
             kitchenPanel.add(kitchenAreaButtons[i]);
         }
+            
 
         // Restaurant area setup
         JPanel tablePanel = new JPanel(new GridLayout(3, 2, 10, 10));
@@ -103,12 +116,53 @@ public class GameScreen extends JFrame {
         tableAreaButtons = new JButton[6];
         for (int i = 0; i < tableAreaButtons.length; i++) {
             tableAreaButtons[i] = new JButton("Table " + (i + 1));
-            tableAreaButtons[i].setBackground(lightBrown);
+            tableAreaButtons[i].setBackground(TABLE_EMPTY_COLOR);
             tableAreaButtons[i].setOpaque(true);
             tableAreaButtons[i].setBorderPainted(false);
             tableAreaButtons[i].setPreferredSize(new Dimension(100, 50));  // Ensure buttons are not oversized
             tablePanel.add(tableAreaButtons[i]);
         }
+
+        // Initialize CardLayout and Center Panel
+        cardLayout = new CardLayout();
+        centerPanel = new JPanel(cardLayout);
+
+        // Stand panel setup
+        JPanel standPanel = new JPanel();
+        standPanel.setLayout(new BorderLayout());
+        standPanel.setPreferredSize(new Dimension(200, 250));
+
+        JLabel standLabel = new JLabel("Stand");
+        standLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        standPanel.add(standLabel, BorderLayout.NORTH);
+
+        itemListPanel = new JPanel();
+        itemListPanel.setLayout(new BoxLayout(itemListPanel, BoxLayout.Y_AXIS));
+        JScrollPane itemScrollPane = new JScrollPane(itemListPanel);
+        standPanel.add(itemScrollPane, BorderLayout.CENTER);
+
+        // Create a panel for the buttons
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+        JButton inventoryButton = new JButton("Inventory");
+        JButton returnButton = new JButton("Return");
+        JButton serveButton = new JButton("Serve");
+        JButton trashButton = new JButton("Trash");
+
+
+        // Add buttons to the button panel
+        buttonPanel.add(inventoryButton);
+        buttonPanel.add(returnButton);
+        buttonPanel.add(serveButton);
+        buttonPanel.add(trashButton);
+
+        // Add the button panel to the standPanel at the SOUTH position
+        standPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        // Add both panels to the centerPanel
+        centerPanel.add(standPanel, "StandPanel");
+        centerPanel.add(pauseMenuContainer, "PauseMenuPanel");
+
 
         // Game chat area setup
         gameChatArea = new JTextArea(5, 20);
@@ -124,15 +178,27 @@ public class GameScreen extends JFrame {
         saveButton.addActionListener(e -> saveButtonClicked());
         returnMenuButton.addActionListener(e -> returnMenuButtonClicked());
         quitButton.addActionListener(e -> quitButtonClicked());
+        for (int i = 0; i < tableAreaButtons.length; i++) {
+            JButton tableAreaButton = tableAreaButtons[i];
+            tableAreaButton.addActionListener(e -> tableButtonClicked(tableAreaButton));
+        }
+        for (int i = 0; i < kitchenAreaButtons.length; i++) {
+            JButton kitchenAreaButton = kitchenAreaButtons[i];
+            kitchenAreaButton.addActionListener(e -> kitchenAreaButtonClicked(kitchenAreaButton));
+        }
+        inventoryButton.addActionListener(e -> inventoryButtonClicked());
+        returnButton.addActionListener(e -> returnButtonClicked());
+        serveButton.addActionListener(e -> serveButtonClicked());
+        trashButton.addActionListener(e -> trashButtonClicked());
 
 
-        // Layout management
+// Layout management
         getContentPane().setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(kitchenPanel, BorderLayout.WEST);
         add(tablePanel, BorderLayout.EAST);
+        add(centerPanel, BorderLayout.CENTER);  // Add centerPanel to the CENTER
         add(scrollPane, BorderLayout.SOUTH);
-        add(pauseMenuContainer, BorderLayout.CENTER); // Add the pause menu container to the center
 
         // Ensure visibility and force repaint
         setVisible(true);
@@ -142,75 +208,84 @@ public class GameScreen extends JFrame {
 
     }
 
-    private void startCustomerArrival() {
-        System.out.println("In Start Customer");
-        customerTimer = new Timer();
-        customerTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                if (!isPaused) {
-                    System.out.println("In swing utilities Customer");
-
-                    SwingUtilities.invokeLater(() -> addCustomerToTable());
-                }
-            }
-        }, 0, 5000); // Customers arrive every 10 seconds
+    private void trashButtonClicked() {
     }
 
-    private void addCustomerToTable() {
-        System.out.println("In add Customer");
-        Random random = new Random();
-        for (int i = 0; i < tableAreaButtons.length; i++) {
-            JButton tableButton = tableAreaButtons[i];
-            System.out.println("In Start Customer");
-            if (tableButton.getBackground().equals(lightBrown)) {
-                System.out.println("In Start Customerrr if statement");
-                int customerCount = random.nextInt(4) + 1; // 1 to 4 customers
-                Customer customer = new Customer("Table " + (i + 1) + " - Customers: " + customerCount, 1.0f);
-                tableButton.setBackground(darkBrown);
-                tableButton.setText(customer.getName());
-                System.out.println("WOWWWW");
-                gameChatArea.append(customer.getName() + " have arrived.\n");
-                int tableIndex = i; // final or effectively final for use in inner class
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        SwingUtilities.invokeLater(() -> showCustomerOrder(customer, tableIndex));
-                    }
-                }, 10000); // 10 seconds delay for customers to think
-                return;
-            }
+    private void serveButtonClicked() {
+    }
+
+
+    private void inventoryButtonClicked() {
+        
+    }
+
+    private void kitchenAreaButtonClicked(JButton kitchenAreaButton) {
+        addItemToStand(kitchenAreaButton.getText());  // Use the button's text as the item
+    }
+
+
+    private void addItemToStand(String item) {
+        JLabel itemLabel = new JLabel(item);
+        itemListPanel.add(itemLabel);
+        itemListPanel.revalidate();
+        itemListPanel.repaint();
+    }
+
+    private void returnButtonClicked() {
+        if (itemListPanel.getComponentCount() > 0) {
+            itemListPanel.remove(0);
+            itemListPanel.revalidate();
+            itemListPanel.repaint();
         }
-        gameChatArea.append("All tables are full!\n");
     }
 
-    private void showCustomerOrder(Customer customer, int tableIndex) {
-    Order order = customer.generateRandomOrder();
-    System.out.println("Got in order part");
-    StringBuilder orderMessage = new StringBuilder("Order: ");
-    for (String item : order.getItems()) {
-        System.out.println("Showing order message");
-        orderMessage.append(item).append(" ");
-    }
-    JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
-    gameChatArea.append(orderMessage.toString() + " at " + customer.getName() + "\n");
-    tableAreaButtons[tableIndex].setText(customer.getName() + " - " + orderMessage.toString());
-}
 
-    private void returnMenuButtonClicked() {
-        gameLogic.exitGame();
-        dispose(); // Close the game screen
-        mainMenu.setVisible(true); // Show the main menu
+    private void tableButtonClicked(JButton tableAreaButton) {
+
+        if (tableAreaButton.getBackground().equals(TABLE_EMPTY_COLOR)){
+            sendChatMessage("Table is empty.\n");
+        } else if (tableAreaButton.getBackground().equals(TABLE_THINKING_COLOR)) {
+            String a="";
+        }else if (tableAreaButton.getBackground().equals(TABLE_ORDERED_COLOR)) {
+            String a="";
+        }else if (tableAreaButton.getBackground().equals(TABLE_EATING_COLOR)) {
+            String a="";
+        }else if (tableAreaButton.getBackground().equals(TABLE_WAITING_TO_LEAVE_COLOR)) {
+            String a="";
+        }
+
     }
+
+    public void addCustomerToTable(Customer customer, int tableIndex) {
+        JButton tableButton = tableAreaButtons[tableIndex];
+        tableButton.setBackground(TABLE_THINKING_COLOR);
+        tableButton.setText(customer.getName());
+        sendChatMessage(customer.getName() + " have arrived.\n");
+    }
+
+    public void orderGiven(Customer customer, int tableIndex, Order order) {
+        StringBuilder orderMessage = new StringBuilder("Order: ");
+        for (String item : order.getItems()) {
+            orderMessage.append(item).append(" ");
+        }
+        JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
+        orderMessage= new StringBuilder(orderMessage.toString() + " at " + customer.getName() + "\n");
+        sendChatMessage(orderMessage.toString());
+        tableAreaButtons[tableIndex].setText(customer.getName() + " - " + orderMessage.toString());
+    }
+
 
     private void saveButtonClicked() {
         //A save system
     }
 
+
     private void resumeButtonClicked() {
         timeManager.resumeTimer();
         pauseButton.setText("Pause");
-        pauseMenuPanel.setVisible(false);
+        // Hide the pause menu and return to the stand panel
+        cardLayout.show(centerPanel, "StandPanel");
+        timeManager.setPaused(false);
     }
 
     private static void quitButtonClicked() {
@@ -218,14 +293,25 @@ public class GameScreen extends JFrame {
     }
 
     private void pauseButtonClicked() {
-        if (isPaused) {
+        if (timeManager.isPaused()) {
             resumeButtonClicked();
         } else {
             timeManager.pauseTimer();
             pauseButton.setText("Resume");
-            pauseMenuPanel.setVisible(true); // Show the pause menu
+            // Show the pause menu
+            cardLayout.show(centerPanel, "PauseMenuPanel");
+            timeManager.setPaused(true);
         }
-        isPaused = !isPaused;
+    }
+
+    private void returnMenuButtonClicked() {
+        gameLogic.exitGame();
+        dispose(); // Close the game screen
+        MainMenu mainMenu = new MainMenu();
+        mainMenu.setVisible(true); // Show the main menu
+    }
+    private void sendChatMessage(String text){
+        gameChatArea.append(text);
     }
 
     public JButton[] getKitchenAreaButtons() {
