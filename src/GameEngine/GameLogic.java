@@ -1,16 +1,36 @@
 package GameEngine;
 
+import java.sql.Time;
+
 public class GameLogic {
     private CustomerManager customerManager;
     private InventoryManager inventoryManager;
+
+    public CustomerManager getCustomerManager() {
+        return customerManager;
+    }
+
+    public InventoryManager getInventoryManager() {
+        return inventoryManager;
+    }
+
+    public RestaurantManager getRestaurantManager() {
+        return restaurantManager;
+    }
+
+    public TimeManager getTimeManager() {
+        return timeManager;
+    }
+
     private RestaurantManager restaurantManager;
     private TimeManager timeManager;
 
     public GameLogic(CustomerManager customerManager, InventoryManager inventoryManager,
-                     RestaurantManager restaurantManager) {
+                     RestaurantManager restaurantManager, TimeManager timeManager) {
         this.customerManager = customerManager;
         this.inventoryManager = inventoryManager;
         this.restaurantManager = restaurantManager;
+        this.timeManager = timeManager;
     }
 
     public void startNewGame() {

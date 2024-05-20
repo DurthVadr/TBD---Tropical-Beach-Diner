@@ -7,18 +7,13 @@ import GameEngine.InventoryManager;
 import GameEngine.RestaurantManager;
 import GameEngine.TimeManager;
 
+import java.sql.Time;
+
 public class Main {
     public static void main(String[] args) {
-        // Initialize the game components
-        CustomerManager customerManager = new CustomerManager();
-        InventoryManager inventoryManager = new InventoryManager();
-        RestaurantManager restaurantManager = new RestaurantManager(customerManager, inventoryManager);
-
-        // Initialize the game logic
-        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager);
 
         // Initialize the GUI components
-        MainMenu mainMenu = new MainMenu(gameLogic);
+        MainMenu mainMenu = new MainMenu();
 
         // Show the main menu initially
         mainMenu.setVisible(true);

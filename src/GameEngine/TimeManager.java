@@ -7,11 +7,19 @@ import java.util.TimerTask;
 public class TimeManager {
     private int totalTime; // Total time in seconds
     private Timer timer;
+
+    public void setTimerLabel(JLabel timerLabel) {
+        this.timerLabel = timerLabel;
+    }
+
     private JLabel timerLabel;
     private TimerTask timerTask;
 
     public TimeManager(JLabel timerLabel) {
         this.timerLabel = timerLabel;
+    }
+
+    public TimeManager() {
     }
 
 
