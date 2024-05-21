@@ -177,5 +177,5 @@ public class GameScreen extends JFrame {
     public void displayMessage(String message) {
         gameChatArea.append(message + "\n");
     }
-
+    
 }

@@ -17,16 +17,10 @@ public class GameLogic {
         // Placeholder for starting a new game
         System.out.println("New game started!");
     }
-
-    //What are these and why they are here?
-//<<<<<<< HEAD
     public void exitGame() {
         // Placeholder for starting a new game
         System.out.println("Game exited!");
     }
-
-//What are these and why they are here?
-//=======
 
     public void endGame() {
         // Placeholder for ending a game
@@ -46,6 +40,4 @@ public class GameLogic {
     
 
     
-//What are these and why they are here?
-// >>>>>>> b192ceb (Test Folder and example test and another logic starts)
 }
