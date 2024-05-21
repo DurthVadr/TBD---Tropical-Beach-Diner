@@ -13,6 +13,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+import java.io.IOException;
+
 public class GameScreen extends JFrame {
 
     private Boolean serving=false;
@@ -38,6 +44,7 @@ public class GameScreen extends JFrame {
 
     private JLabel moneyLabel;
     private JLabel satisfactionLabel;
+    private Clip backgroundMusicClip;
 
 
     public void setGameLogic(GameLogic gameLogic) {
@@ -52,11 +59,11 @@ public class GameScreen extends JFrame {
     private final Color TABLE_ORDERED_COLOR = new Color(0, 199, 255);
     private final Color TABLE_EATING_COLOR = new Color(255, 255, 30);
     private final Color TABLE_WAITING_TO_LEAVE_COLOR = new Color(70, 255, 46);
-
-
+    
 
 
     public GameScreen(){
+        
     }
 
     public void initialize() {
@@ -64,17 +71,22 @@ public class GameScreen extends JFrame {
     }
 
     private void initUI() {
+
+        
         setTitle("Tropical Beach Dinner - Game Screen");
         setSize(1280, 720);  // Adjust size for better control over layout
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
+
         // Initialize labels
         JLabel timerLabel = new JLabel("Time: 05:00");
         satisfactionLabel = new JLabel("Satisfaction: 100%");
         moneyLabel = new JLabel("Money: $0");
         updateMoney(gameLogic.getMoney());
+
+        
 
         // Initialize the pause button
         pauseButton = new JButton("Pause");
@@ -207,7 +219,6 @@ public class GameScreen extends JFrame {
         serveButton.addActionListener(e -> serveButtonClicked());
         trashButton.addActionListener(e -> trashButtonClicked());
 
-
     // Layout management
         getContentPane().setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
@@ -221,7 +232,7 @@ public class GameScreen extends JFrame {
         revalidate();
         repaint();
 
-
+        playBackgroundMusic("assets/game_background.wav");
     }
 
     private void trashButtonClicked() {
@@ -371,6 +382,7 @@ public class GameScreen extends JFrame {
     }
 
     private void resumeButtonClicked() {
+        playBackgroundMusic("assets/game_background.wav");
         timeManager.resumeTimer();
         pauseButton.setText("Pause");
         // Hide the pause menu and return to the stand panel
@@ -383,6 +395,9 @@ public class GameScreen extends JFrame {
     }
 
     private void pauseButtonClicked() {
+
+        stopBackgroundMusic();
+
         if (timeManager.isPaused()) {
             resumeButtonClicked();
         } else {
@@ -455,5 +470,24 @@ public class GameScreen extends JFrame {
         sendChatMessage(msg);
         tableAreaButtons[tableIndex].setText("Table "+tableIndex+1);
         tableAreaButtons[tableIndex].setBackground(TABLE_EMPTY_COLOR);
+    }
+
+
+    private void playBackgroundMusic(String filePath) {
+        try {
+            File musicFile = new File(filePath);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicFile);
+            backgroundMusicClip = AudioSystem.getClip();
+            backgroundMusicClip.open(audioInputStream);
+            backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopBackgroundMusic() {
+        if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+            backgroundMusicClip.stop();
+        }
     }
 }
