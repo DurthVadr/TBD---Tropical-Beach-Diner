@@ -10,9 +10,11 @@ import java.util.*;
 import java.util.Timer;
 
 public class GameLogic {
-    private float money=0f;
-    private static final List<String> MENU_ITEMS = Arrays.asList("Meat", "Cheese", "Lettuce", "Tomato", "Dough", "Pepperoni");
-    private static final List<Float> ITEM_PRICES = Arrays.asList(10.0f, 12.0f, 8.0f, 15.0f, 7.0f,5.0f);
+
+    private float money=10f;
+    public static final List<String> MENU_ITEMS = Arrays.asList("Meat", "Cheese", "Lettuce", "Tomato", "Dough", "Pepperoni");
+    public static final List<Float> ITEM_PRICES = Arrays.asList(10.0f, 12.0f, 8.0f, 15.0f, 7.0f,5.0f);
+
 
     private final GameScreen gameScreen;
     private final CustomerManager customerManager;
@@ -133,7 +135,7 @@ public class GameLogic {
         if(!standItems.isEmpty()){
             while (!standItems.isEmpty()) {
                 Item removedItem=standItems.remove(0);
-                inventoryManager.addItem(removedItem);
+                inventoryManager.addItem(removedItem.getName());
             }
             gameScreen.removeItemsFromStand();
         }
@@ -188,5 +190,31 @@ public class GameLogic {
         gameScreen.updateMoney(money);
         restaurantManager.removeCustomerFromTable(tableIndex);
         gameScreen.tableEmptied(customer, tableIndex);
+    }
+
+    public List<Integer> inventoryOpened() {
+        List<Integer> numbers = new ArrayList<>();
+        for (int i=0;i<MENU_ITEMS.size();i++){
+            Item item = new Item(MENU_ITEMS.get(i));
+            numbers.add(inventoryManager.checkItem(item.getName()));
+        }
+        return numbers;
+    }
+
+    public void buyItem(String itemName, float price) {
+        if (money>=price){
+            inventoryManager.addItem(itemName);
+            money-=price;
+            gameScreen.drawInventory();
+            gameScreen.updateMoney(money);
+        }
+        else{
+
+        }
+    }
+
+
+    public float getMoney() {
+        return money;
     }
 }

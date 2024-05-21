@@ -20,6 +20,16 @@ public class InventoryManager {
         // Add more items as needed
     }
 
+    public Integer checkItem(String itemName) {
+
+        for (Item item : inventory.keySet()) {
+            if (item.getName().equals(itemName)) {
+                return inventory.get(item);
+            }
+        }
+        return 0;
+    }
+
     public Item getItem(String itemName) {
         for (Item item : inventory.keySet()) {
             if (item.getName().equals(itemName) & inventory.get(item)>0) {
@@ -30,9 +40,13 @@ public class InventoryManager {
         return new Item("null");
     }
 
-    public void addItem(Item item) {
-        inventory.put(item, inventory.get(item) + 1);
-        System.out.println("Item added!");
+    public void addItem(String itemName) {
+        for (Item item : inventory.keySet()) {
+            if (item.getName().equals(itemName)) {
+                inventory.put(item, inventory.get(item) + 1);
+                System.out.println("Item added!");
+            }
+        }
     }
 
     public void removeItem(Item item) {
@@ -44,5 +58,4 @@ public class InventoryManager {
         }
     }
 
-    //contains items
 }

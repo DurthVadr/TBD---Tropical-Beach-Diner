@@ -9,10 +9,12 @@ import Restaurant.Order;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class GameScreen extends JFrame {
 
     private Boolean serving=false;
+    private Boolean inventoryOpened=false;
     private GameLogic gameLogic;
     private TimeManager timeManager;
     private CustomerManager customerManager;
@@ -70,6 +72,7 @@ public class GameScreen extends JFrame {
         JLabel timerLabel = new JLabel("Time: 05:00");
         satisfactionLabel = new JLabel("Satisfaction: 100%");
         moneyLabel = new JLabel("Money: $0");
+        updateMoney(gameLogic.getMoney());
 
         // Initialize the pause button
         pauseButton = new JButton("Pause");
@@ -109,12 +112,12 @@ public class GameScreen extends JFrame {
         JPanel kitchenPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         kitchenPanel.setPreferredSize(new Dimension(300, 250));  // Set preferred size to control expansion
         kitchenAreaButtons = new JButton[6];
-        String[] buttonNames = {"Meat", "Cheese", "Lettuce", "Tomato", "Dough", "Pepperoni"};  // Button names
+
         for (int i = 0; i < kitchenAreaButtons.length; i++) {
-            kitchenAreaButtons[i] = new JButton(buttonNames[i]);
+            kitchenAreaButtons[i] = new JButton(GameLogic.MENU_ITEMS.get(i));
             kitchenPanel.add(kitchenAreaButtons[i]);
         }
-            
+
 
         // Restaurant area setup
         JPanel tablePanel = new JPanel(new GridLayout(3, 2, 10, 10));
@@ -244,12 +247,53 @@ public class GameScreen extends JFrame {
     }
 
     private void inventoryButtonClicked() {
-        
+        if (inventoryOpened){
+            for (int i = 0; i < kitchenAreaButtons.length; i++) {
+                kitchenAreaButtons[i].setText(GameLogic.MENU_ITEMS.get(i));
+            }
+            revalidate();
+            repaint();
+        }
+        else {
+            drawInventory();
+        }
+        inventoryOpened=!inventoryOpened;
+    }
+
+    public void drawInventory() {
+        List<Integer> numbers = gameLogic.inventoryOpened();
+        for (int i = 0; i < kitchenAreaButtons.length; i++) {
+            String txt ="<html>" + GameLogic.MENU_ITEMS.get(i)+"<br>Inventory: "+numbers.get(i)+"<br>Buy for $"+GameLogic.ITEM_PRICES.get(i)+"</html>";
+            kitchenAreaButtons[i].setText(txt);
+        }
+        revalidate();
+        repaint();
     }
 
     private void kitchenAreaButtonClicked(JButton kitchenAreaButton) {
-        String itemName = kitchenAreaButton.getText();
-        gameLogic.addItemToStand(itemName);
+        if(inventoryOpened){
+
+            String htmlString = kitchenAreaButton.getText();
+
+            // Extract itemName
+            int startIndex = htmlString.indexOf(">") + 1;
+            int endIndex = htmlString.indexOf("<br>");
+            String itemName = htmlString.substring(startIndex, endIndex);
+
+            // Extract price
+            String pricePrefix = "Buy for $";
+            startIndex = htmlString.lastIndexOf(pricePrefix) + pricePrefix.length();
+            endIndex = htmlString.indexOf("</html>");
+            String itemPriceString = htmlString.substring(startIndex, endIndex);
+            // Cast itemPrice to float
+            float itemPrice = Float.parseFloat(itemPriceString.trim());
+
+            gameLogic.buyItem(itemName,itemPrice);
+        }
+        else{
+            String itemName = kitchenAreaButton.getText();
+            gameLogic.addItemToStand(itemName);
+        }
     }
 
     public void addItemToStand(String item) {
