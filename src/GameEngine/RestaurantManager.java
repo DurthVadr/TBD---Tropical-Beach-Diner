@@ -30,7 +30,7 @@ public class RestaurantManager {
         }
         tableCustomerMap.put(tableIndex, customer);
         System.out.println("Customer added to table " + tableIndex);
-        gameScreen.addCustomerToTable(customer, tableIndex);
+        gameScreen.tableNewCustomer(customer, tableIndex);
         gameLogic.scheduleCustomerOrder(customer, tableIndex);
     }
 
@@ -66,6 +66,8 @@ public class RestaurantManager {
     public int getTotalTables() {
         return TOTAL_TABLES;
     }
+
+
 
     // Example method to print the status of all tables
     public void printTableStatus() {

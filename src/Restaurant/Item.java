@@ -1,15 +1,12 @@
 package Restaurant;
 
-import java.util.Objects;
-
 public class Item {
-
     private String name;
     private float price;
+    private int quantity;
 
-    public Item(String name, float price) {
+    public Item(String name) {
         this.name = name;
-        this.price = price;
     }
 
     public String getName() {
@@ -20,36 +17,11 @@ public class Item {
         return price;
     }
 
-
-    String type;
-    Integer amount;
-
-
-    public Item(String type, Integer amount) {
-        this.type = type;
-        this.amount = amount;
+    public int getQuantity() {
+        return quantity;
     }
 
-    void changeAmount(Integer n) {
-        this.amount += n;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
-
-
-
-    // Override equals and hashCode to correctly compare items
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        Item item = (Item) obj;
-        return Float.compare(item.price, price) == 0 &&
-                name.equals(item.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, price);
-    }
-
-
 }
