@@ -101,4 +101,9 @@ public class CustomerManager {
     public void reduceSatisfactionOverTime(Customer customer, float amount) {
         customer.setSatisfaction(customer.getSatisfaction() - amount);
     }
+
+    public List<Customer> getCustomers() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCustomers'");
+    }
 }

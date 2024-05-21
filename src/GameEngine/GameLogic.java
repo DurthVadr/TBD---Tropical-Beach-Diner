@@ -39,6 +39,8 @@ public class GameLogic {
         return gameScreen;
     }
 
+    
+
 
     public GameLogic(CustomerManager customerManager, InventoryManager inventoryManager,
             RestaurantManager restaurantManager, TimeManager timeManager, GameScreen gameScreen) {
@@ -163,6 +165,7 @@ public class GameLogic {
             serve.addItem(item);
         }
         customer.serve(serve);
+        float pay = customerManager.checkOrder(customer);
         customer.setPayment(pay);
         customerEating(customer, tableIndex);
     }
@@ -184,12 +187,16 @@ public class GameLogic {
 
     public void collectMoneyFromTable(int tableIndex) {
         Customer customer = restaurantManager.getCustomerAtTable(tableIndex);
-        float satisfaction = customer.getSatisfaction();
-        float payment = customer.getPayment() * satisfaction; // Adjust payment based on satisfaction
-        updateMoney(gameLogic.getMoney() + payment);
-        tableEmptied(customer, tableIndex);
+        money += customer.getPayment();
+        restaurantManager.removeCustomerFromTable(tableIndex);
+        gameScreen.tableEmptied(customer, tableIndex);
     }
     
+    private void tableEmptied(Customer customer, int tableIndex) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'tableEmptied'");
+    }
+
     public float calculateCollectiveSatisfaction() {
     List<Customer> customers = customerManager.getCustomers();
     float totalSatisfaction = 0;
@@ -236,6 +243,13 @@ public GameState createGameState() {
     gameState.setTimeRemaining(timeManager.getTotalTime());
     return gameState;
 }
+
+
+public void exitGame() {
+    gameScreen.dispose();
+    System.exit(0);
+}
+
 
 public void loadGameState(GameState gameState) {
     inventoryManager.setInventory(gameState.getInventory());
