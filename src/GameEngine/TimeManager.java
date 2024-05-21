@@ -11,7 +11,7 @@ public class TimeManager {
     private GameLogic gameLogic;
     private RestaurantManager restaurantManager;
     private CustomerManager customerManager;
-    private int totalTime=300;
+    private int totalTime=60;
     private Timer timer;
     private boolean isPaused = false;
     private JLabel timerLabel;
@@ -48,6 +48,10 @@ public class TimeManager {
         };
     }
 
+    public void addTime(int additionalTime) {
+        totalTime += additionalTime;
+    }
+    
     private void updateTimerLabel() {
         int minutes = totalTime / 60;
         int seconds = totalTime % 60;

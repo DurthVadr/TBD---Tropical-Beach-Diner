@@ -154,6 +154,7 @@ public class GameLogic {
         customer.serve(serve);
         float pay = customerManager.checkOrder(customer);
         customer.setPayment(pay);
+        timeManager.addTime(10);
         // Handle payment logic here, e.g., updating player's money
         // Clear stand items after serving
         customerEating(customer,tableIndex);
