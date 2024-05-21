@@ -62,6 +62,11 @@ public class RestaurantManager {
     }
 
 
+    public int getTableCount() {
+        return TOTAL_TABLES;
+    }
+
+
     // Example method to print the status of all tables
     public void printTableStatus() {
         for (int i = 1; i <= TOTAL_TABLES; i++) {

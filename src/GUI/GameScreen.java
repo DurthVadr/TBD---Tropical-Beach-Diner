@@ -43,7 +43,7 @@ public class GameScreen extends JFrame {
     private JButton trashButton;
 
     private JLabel moneyLabel;
-    private JLabel satisfactionLabel;
+    private JLabel collectiveSatisfactionLabel;
     private Clip backgroundMusicClip;
 
 
@@ -82,7 +82,7 @@ public class GameScreen extends JFrame {
 
         // Initialize labels
         JLabel timerLabel = new JLabel("Time: 05:00");
-        satisfactionLabel = new JLabel("Satisfaction: 100%");
+        collectiveSatisfactionLabel = new JLabel("Collective Satisfaction: 100%");
         moneyLabel = new JLabel("Money: $0");
         updateMoney(gameLogic.getMoney());
 
@@ -114,7 +114,7 @@ public class GameScreen extends JFrame {
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 10));
         topPanel.add(pauseButton); // Add the pause button to the top panel
         topPanel.add(timerLabel);
-        topPanel.add(satisfactionLabel);
+        topPanel.add(collectiveSatisfactionLabel);
         topPanel.add(moneyLabel);
         add(topPanel, BorderLayout.NORTH);
 
@@ -362,8 +362,23 @@ public class GameScreen extends JFrame {
     public void tableNewCustomer(Customer customer, int tableIndex) {
         JButton tableButton = tableAreaButtons[tableIndex];
         tableButton.setBackground(TABLE_THINKING_COLOR);
-        tableButton.setText(customer.getName());
+        tableButton.setText(
+                "<html>" + customer.getName() + "<br>Satisfaction: " + customer.getSatisfaction() * 100 + "%</html>");
         sendChatMessage(customer.getName() + " have arrived.\n");
+    }
+
+    public void updateCustomerSatisfaction(Customer customer, int tableIndex) {
+        JButton tableButton = tableAreaButtons[tableIndex];
+        tableButton.setText(
+                "<html>" + customer.getName() + "<br>Satisfaction: " + customer.getSatisfaction() * 100 + "%</html>");
+        updateCollectiveSatisfaction();
+    }
+
+    private void updateCollectiveSatisfaction() {
+        float totalSatisfaction = gameLogic.calculateCollectiveSatisfaction();
+        collectiveSatisfactionLabel.setText("Collective Satisfaction: " + totalSatisfaction * 100 + "%");
+        revalidate();
+        repaint();
     }
 
     public void tableOrderGiven(Customer customer, int tableIndex, Order order) {
