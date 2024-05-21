@@ -1,16 +1,19 @@
 package Restaurant;
 
-public class Customer {
-    private Order order;
-    private String name;
-    private Float satisfaction;
+import java.io.Serializable;
 
-    public Customer() {
-        this.name = "Default Name";
-        this.satisfaction = 1.0f; // Default satisfaction level
+public class Customer implements Serializable {
+    private Order order;
+    private Order served;
+    private final String name;
+    private Float satisfaction;
+    private Float payment;
+
+    public void serve(Order served){
+        this.served=served;
     }
 
-    public Customer(String name, Float satisfaction) {
+    public Customer(String name, float satisfaction) {
         this.name = name;
         this.satisfaction = satisfaction;
     }
@@ -19,46 +22,16 @@ public class Customer {
         this.order = order;
     }
 
-    public void receiveItem(Item item) {
-        // Logic for the customer to receive the item
-        System.out.println("Customer received: " + item.getName());
-    }
-
     public Order getOrder() {
         return order;
     }
 
-    public float checkOrder(Item item, Order order) {
-        boolean itemFound = false;
-        float total = 0.0f;
-
-//        for (Item orderedItem : order.getItems()) {
-//            if (orderedItem.equals(item)) {
-//                itemFound = true;
-//                total += orderedItem.getPrice();
-//            }
-//        }
-
-//        if (!itemFound) {
-//            // Decrease satisfaction if the item not found
-//            this.satisfaction -= 0.1; // Decrease by 10% (can be modified)
-//            if (this.satisfaction < 0) {
-//                this.satisfaction = 0;
-//            }
-//        }
-        return total;
-    }
-
-    void giveOrder(Order order) {
-        //TODO: Implement
+    public Order getServed() {
+        return served;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public float getSatisfaction() {
@@ -67,5 +40,18 @@ public class Customer {
 
     public void setSatisfaction(float satisfaction) {
         this.satisfaction = satisfaction;
+    }
+
+    public void receiveItem(Item item) {
+        // Logic for the customer to receive the item
+        System.out.println("Customer received: " + item.getName());
+    }
+
+    public void setPayment(float pay) {
+        this.payment=pay;
+    }
+
+    public float getPayment() {
+        return payment;
     }
 }
