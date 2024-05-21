@@ -1,21 +1,26 @@
 package GUI;
 
-import GameEngine.GameLogic;
+import GameEngine.*;
+import Persistence.GameState;
+import Persistence.SaveLoadSystem;
 
 import javax.swing.*;
 import java.awt.*;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+import java.io.IOException;
+
+
 public class MainMenu extends JFrame {
-    private GameLogic gameLogic;
-    private JLabel titleLabel;
     private JButton startGameButton;
-    private JButton loadGameButton;
-    private JButton optionsButton;
     private JButton exitGameButton;
+    private Clip backgroundMusicClip;
 
 
-    public MainMenu(GameLogic gameLogic) {
-        this.gameLogic = gameLogic;
+    public MainMenu() {
         initUI();
     }
 
@@ -27,16 +32,17 @@ public class MainMenu extends JFrame {
         setResizable(false);
 
         // Initialize components
-        titleLabel = new JLabel("Tropical Beach Dinner", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36)); // Set font for the title
+        JLabel titleLabel = new JLabel("Tropical Beach Diner", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Chalkboard", Font.BOLD, 36)); // Set font for the title
+        titleLabel.setForeground(new Color(255, 69, 0)); // bright orange
         titleLabel.setPreferredSize(new Dimension(1280, 130));
 
         startGameButton = new JButton("Start New Game");
         startGameButton.setPreferredSize(new Dimension(340, 100));
-        loadGameButton = new JButton("Load Game");
+        JButton loadGameButton = new JButton("Load Game");
         loadGameButton.setPreferredSize(new Dimension(340, 100));
-        optionsButton = new JButton("Options");
-        optionsButton.setPreferredSize(new Dimension(340, 100));
+        JButton creditsButton = new JButton("Credits");
+        creditsButton.setPreferredSize(new Dimension(340, 100));
         exitGameButton = new JButton("Exit Game");
         exitGameButton.setPreferredSize(new Dimension(340, 100));
 
@@ -58,7 +64,7 @@ public class MainMenu extends JFrame {
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Add spacing between buttons
         centerPanel.add(createButtonPanel(loadGameButton));
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        centerPanel.add(createButtonPanel(optionsButton));
+        centerPanel.add(createButtonPanel(creditsButton));
         centerPanel.add(Box.createVerticalGlue());
 
         // Bottom panel for the exit button with padding
@@ -76,25 +82,64 @@ public class MainMenu extends JFrame {
         // Add action listeners
         startGameButton.addActionListener(e -> startGameButtonClicked());
         loadGameButton.addActionListener(e -> loadGameButtonClicked());
-        optionsButton.addActionListener(e -> optionsButtonClicked());
+        creditsButton.addActionListener(e -> creditsButtonClicked());
         exitGameButton.addActionListener(e -> exitGameButtonClicked());
+
+        playBackgroundMusic("assets/main_menu.wav");
     }
 
     private void startGameButtonClicked() {
-        gameLogic.startNewGame();
+        stopBackgroundMusic();
+
+
+        // Initialize the game components
+        CustomerManager customerManager = new CustomerManager();
+        InventoryManager inventoryManager = new InventoryManager();
+        RestaurantManager restaurantManager = new RestaurantManager();
+        TimeManager timeManager = new TimeManager();
+        GameScreen gameScreen = new GameScreen();
+
+
+
+        // Initialize the game logic
+        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
         dispose();
-        new GameScreen(gameLogic, this).setVisible(true); // Pass MainMenu reference
+        gameLogic.startNewGame();
     }
 
     private void loadGameButtonClicked() {
-        // Handle load game button action
+        SaveLoadSystem saveLoadSystem = new SaveLoadSystem();
+        GameState gameState = saveLoadSystem.loadGame("savegame.dat");
+
+        if (gameState != null) {
+            CustomerManager customerManager = new CustomerManager();
+            InventoryManager inventoryManager = new InventoryManager();
+            RestaurantManager restaurantManager = new RestaurantManager();
+            TimeManager timeManager = new TimeManager();
+            GameScreen gameScreen = new GameScreen();
+
+            // Initialize the game logic with the loaded state
+            GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
+
+            dispose();
+            gameLogic.loadGameState(gameState);
+        } else {
+            JOptionPane.showMessageDialog(this, "No saved game found!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
-    private void optionsButtonClicked() {
-        // Handle options button action
+    private void creditsButtonClicked() {
+        JOptionPane.showMessageDialog(this, "Tropical Beach Diner\n\nDeveloped by:\n" +
+        "- Ata Seyhan\n" +
+        "- Can Çağatay Sevgican\n" +
+        "- Halil Nebioğlu\n" +
+        "- Kerem Bayram\n" +
+        "- Mertcan Sağlam\n", "Credits", JOptionPane.INFORMATION_MESSAGE);
+        
     }
 
     private void exitGameButtonClicked() {
+        stopBackgroundMusic();
         System.exit(0);
     }
 
@@ -111,5 +156,23 @@ public class MainMenu extends JFrame {
         panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         panel.add(button);
         return panel;
+    }
+
+    private void playBackgroundMusic(String filePath) {
+        try {
+            File musicFile = new File(filePath);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicFile);
+            backgroundMusicClip = AudioSystem.getClip();
+            backgroundMusicClip.open(audioInputStream);
+            backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopBackgroundMusic() {
+        if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+            backgroundMusicClip.stop();
+        }
     }
 }

@@ -1,24 +1,23 @@
-import GUI.Controller;
-import GUI.GameScreen;
 import GUI.MainMenu;
-import GameEngine.CustomerManager;
-import GameEngine.GameLogic;
-import GameEngine.InventoryManager;
-import GameEngine.RestaurantManager;
-import GameEngine.TimeManager;
 
+import java.awt.GraphicsEnvironment;
 public class Main {
+
+    
     public static void main(String[] args) {
-        // Initialize the game components
-        CustomerManager customerManager = new CustomerManager();
-        InventoryManager inventoryManager = new InventoryManager();
-        RestaurantManager restaurantManager = new RestaurantManager(customerManager, inventoryManager);
 
-        // Initialize the game logic
-        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager);
+        //list all available fonts if you want to use something else
 
+        // GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        // String[] fontNames = ge.getAvailableFontFamilyNames();
+        // for (String fontName : fontNames) {
+        //     System.out.println(fontName);
+        // }
+
+
+      
         // Initialize the GUI components
-        MainMenu mainMenu = new MainMenu(gameLogic);
+        MainMenu mainMenu = new MainMenu();
 
         // Show the main menu initially
         mainMenu.setVisible(true);
