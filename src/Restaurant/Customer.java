@@ -1,14 +1,11 @@
 package Restaurant;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Arrays;
+import java.io.Serializable;
 
-public class Customer {
+public class Customer implements Serializable {
     private Order order;
     private Order served;
-    private String name;
+    private final String name;
     private Float satisfaction;
     private Float payment;
 

@@ -1,6 +1,7 @@
 package GameEngine;
 
 import GUI.GameScreen;
+import Persistence.GameState;
 import Restaurant.Customer;
 import Restaurant.Item;
 import Restaurant.Order;
@@ -25,10 +26,6 @@ public class GameLogic {
 
     public CustomerManager getCustomerManager() {
         return customerManager;
-    }
-
-    public InventoryManager getInventoryManager() {
-        return inventoryManager;
     }
 
     public RestaurantManager getRestaurantManager() {
@@ -59,7 +56,6 @@ public class GameLogic {
         System.out.println("New game started!");
         gameScreen.setGameLogic(this);
         restaurantManager.setGameLogic(this);
-
         gameScreen.initialize();
         gameScreen.setVisible(true);
         startCustomerArrival();
@@ -170,15 +166,6 @@ public class GameLogic {
         gameScreen.tableFinished(customer,tableIndex);
     }
 
-    public void scheduleCustomerFinish(Customer customer, int tableIndex) {
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                SwingUtilities.invokeLater(() -> gaveOrder(customer, tableIndex));
-            }
-        }, 2000); // 10 seconds delay for customers to think
-    }
-
     public void trashItemsFromStand() {
         standItems.clear();
         gameScreen.removeItemsFromStand();
@@ -194,8 +181,8 @@ public class GameLogic {
 
     public List<Integer> inventoryOpened() {
         List<Integer> numbers = new ArrayList<>();
-        for (int i=0;i<MENU_ITEMS.size();i++){
-            Item item = new Item(MENU_ITEMS.get(i));
+        for (String menuItem : MENU_ITEMS) {
+            Item item = new Item(menuItem);
             numbers.add(inventoryManager.checkItem(item.getName()));
         }
         return numbers;
@@ -209,7 +196,7 @@ public class GameLogic {
             gameScreen.updateMoney(money);
         }
         else{
-
+            gameScreen.sendChatMessage("Not enough money.");
         }
     }
 
@@ -217,4 +204,25 @@ public class GameLogic {
     public float getMoney() {
         return money;
     }
+
+
+    public GameState createGameState() {
+        GameState gameState = new GameState();
+        gameState.setInventory(inventoryManager.getInventory());
+        gameState.setCustomers(restaurantManager.getTableCustomerMap());
+        gameState.setMoney(money);
+        gameState.setTimeRemaining(timeManager.getTotalTime());
+        return gameState;
+    }
+
+    public void loadGameState(GameState gameState) {
+        inventoryManager.setInventory(gameState.getInventory());
+        restaurantManager.setCustomers(gameState.getCustomers());
+        money = gameState.getMoney();
+        timeManager.setTotalTime(gameState.getTimeRemaining());
+        gameScreen.revalidate();
+        gameScreen.repaint();
+        startNewGame();
+    }
+
 }

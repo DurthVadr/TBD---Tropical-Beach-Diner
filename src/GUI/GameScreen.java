@@ -4,8 +4,10 @@ import GameEngine.CustomerManager;
 import GameEngine.GameLogic;
 import GameEngine.RestaurantManager;
 import GameEngine.TimeManager;
+import Persistence.SaveLoadSystem;
 import Restaurant.Customer;
 import Restaurant.Order;
+import Persistence.GameState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -287,7 +289,6 @@ public class GameScreen extends JFrame {
             String itemPriceString = htmlString.substring(startIndex, endIndex);
             // Cast itemPrice to float
             float itemPrice = Float.parseFloat(itemPriceString.trim());
-
             gameLogic.buyItem(itemName,itemPrice);
         }
         else{
@@ -363,9 +364,11 @@ public class GameScreen extends JFrame {
 
 
     private void saveButtonClicked() {
-        //A save system
+        GameState gameState = gameLogic.createGameState();
+        SaveLoadSystem saveLoadSystem = new SaveLoadSystem();
+        saveLoadSystem.saveGame(gameState, "savegame.dat");
+        sendChatMessage("Game saved successfully.");
     }
-
 
     private void resumeButtonClicked() {
         timeManager.resumeTimer();
@@ -397,7 +400,7 @@ public class GameScreen extends JFrame {
         MainMenu mainMenu = new MainMenu();
         mainMenu.setVisible(true); // Show the main menu
     }
-    private void sendChatMessage(String text){
+    public void sendChatMessage(String text){
         if (!text.endsWith("\n")){
             text=text+"\n";
         }

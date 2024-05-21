@@ -80,4 +80,12 @@ public class TimeManager {
     public void setPaused(boolean paused) {
         isPaused = paused;
     }
+
+    public int getTotalTime() {
+        return totalTime;
+    }
+
+    public void setTotalTime(int timeRemaining) {
+        this.totalTime=timeRemaining;
+    }
 }

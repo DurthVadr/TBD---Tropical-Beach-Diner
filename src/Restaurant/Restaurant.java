@@ -1,9 +1,10 @@
 package Restaurant;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Restaurant {
+public class Restaurant implements Serializable {
     private Inventory inventory;
     private List<Customer> customers;
 

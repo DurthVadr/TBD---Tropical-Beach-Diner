@@ -1,6 +1,9 @@
 package GUI;
 
 import GameEngine.*;
+import Persistence.GameState;
+import Persistence.SaveLoadSystem;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -93,20 +96,24 @@ public class MainMenu extends JFrame {
     }
 
     private void loadGameButtonClicked() {
-//        SaveLoadSystem saveLoadSystem = new SaveLoadSystem();
-//        if (saveLoadSystem.loadGame()) {
-//            CustomerManager customerManager = new CustomerManager();
-//            InventoryManager inventoryManager = new InventoryManager();
-//            RestaurantManager restaurantManager = new RestaurantManager();
-//            TimeManager timeManager = new TimeManager();
-//            GameScreen gameScreen = new GameScreen();
-//
-//            GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
-//            dispose();
-//            gameLogic.loadGame(saveLoadSystem.getLoadedGameState());
-//        } else {
-//            JOptionPane.showMessageDialog(this, "No saved game found!", "Error", JOptionPane.ERROR_MESSAGE);
-//        }
+        SaveLoadSystem saveLoadSystem = new SaveLoadSystem();
+        GameState gameState = saveLoadSystem.loadGame("savegame.dat");
+
+        if (gameState != null) {
+            CustomerManager customerManager = new CustomerManager();
+            InventoryManager inventoryManager = new InventoryManager();
+            RestaurantManager restaurantManager = new RestaurantManager();
+            TimeManager timeManager = new TimeManager();
+            GameScreen gameScreen = new GameScreen();
+
+            // Initialize the game logic with the loaded state
+            GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
+
+            dispose();
+            gameLogic.loadGameState(gameState);
+        } else {
+            JOptionPane.showMessageDialog(this, "No saved game found!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void optionsButtonClicked() {
