@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RestaurantManager {
-
-
-
     private GameLogic gameLogic;
     private GameScreen gameScreen;
 
@@ -25,12 +22,14 @@ public class RestaurantManager {
     }
     // Add a customer to a specific table
     public void addCustomerToTable(int tableIndex, Customer customer) {
+
         if (tableIndex < 0 || tableIndex > TOTAL_TABLES) {
             throw new IllegalArgumentException("Invalid table number");
         }
+
         tableCustomerMap.put(tableIndex, customer);
         System.out.println("Customer added to table " + tableIndex);
-        gameScreen.addCustomerToTable(customer, tableIndex);
+        gameScreen.tableNewCustomer(customer, tableIndex);
         gameLogic.scheduleCustomerOrder(customer, tableIndex);
     }
 
@@ -62,10 +61,6 @@ public class RestaurantManager {
         return tableCustomerMap.containsKey(tableNumber);
     }
 
-    // Get the total number of tables
-    public int getTotalTables() {
-        return TOTAL_TABLES;
-    }
 
     // Example method to print the status of all tables
     public void printTableStatus() {
@@ -77,5 +72,13 @@ public class RestaurantManager {
                 System.out.println("Table " + i + ": Empty");
             }
         }
+    }
+
+    public Map<Integer, Customer> getTableCustomerMap() {
+        return tableCustomerMap;
+    }
+
+    public void setCustomers(Map<Integer, Customer> customers) {
+        this.tableCustomerMap=customers;
     }
 }

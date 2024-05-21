@@ -1,16 +1,17 @@
 package Restaurant;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Arrays;
+import java.io.Serializable;
 
-public class Customer {
+public class Customer implements Serializable {
     private Order order;
-    private String name;
+    private Order served;
+    private final String name;
     private Float satisfaction;
+    private Float payment;
 
-
+    public void serve(Order served){
+        this.served=served;
+    }
 
     public Customer(String name, float satisfaction) {
         this.name = name;
@@ -23,6 +24,10 @@ public class Customer {
 
     public Order getOrder() {
         return order;
+    }
+
+    public Order getServed() {
+        return served;
     }
 
     public String getName() {
@@ -42,4 +47,11 @@ public class Customer {
         System.out.println("Customer received: " + item.getName());
     }
 
+    public void setPayment(float pay) {
+        this.payment=pay;
     }
+
+    public float getPayment() {
+        return payment;
+    }
+}

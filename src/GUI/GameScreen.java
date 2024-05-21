@@ -4,16 +4,25 @@ import GameEngine.CustomerManager;
 import GameEngine.GameLogic;
 import GameEngine.RestaurantManager;
 import GameEngine.TimeManager;
+import Persistence.SaveLoadSystem;
 import Restaurant.Customer;
 import Restaurant.Order;
+import Persistence.GameState;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
-import java.util.Timer;
+import java.util.List;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+import java.io.IOException;
 
 public class GameScreen extends JFrame {
 
+    private Boolean serving=false;
+    private Boolean inventoryOpened=false;
     private GameLogic gameLogic;
     private TimeManager timeManager;
     private CustomerManager customerManager;
@@ -28,6 +37,14 @@ public class GameScreen extends JFrame {
 
     private JButton pauseButton;
     private JPanel itemListPanel;
+    private JButton inventoryButton;
+    private JButton returnButton;
+    private JButton serveButton;
+    private JButton trashButton;
+
+    private JLabel moneyLabel;
+    private JLabel satisfactionLabel;
+    private Clip backgroundMusicClip;
 
 
     public void setGameLogic(GameLogic gameLogic) {
@@ -42,11 +59,11 @@ public class GameScreen extends JFrame {
     private final Color TABLE_ORDERED_COLOR = new Color(0, 199, 255);
     private final Color TABLE_EATING_COLOR = new Color(255, 255, 30);
     private final Color TABLE_WAITING_TO_LEAVE_COLOR = new Color(70, 255, 46);
-
-
+    
 
 
     public GameScreen(){
+        
     }
 
     public void initialize() {
@@ -54,16 +71,22 @@ public class GameScreen extends JFrame {
     }
 
     private void initUI() {
+
+        
         setTitle("Tropical Beach Dinner - Game Screen");
         setSize(1280, 720);  // Adjust size for better control over layout
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
+
         // Initialize labels
         JLabel timerLabel = new JLabel("Time: 05:00");
-        JLabel satisfactionLabel = new JLabel("Satisfaction: 100%");
-        JLabel moneyLabel = new JLabel("Money: $0");
+        satisfactionLabel = new JLabel("Satisfaction: 100%");
+        moneyLabel = new JLabel("Money: $0");
+        updateMoney(gameLogic.getMoney());
+
+        
 
         // Initialize the pause button
         pauseButton = new JButton("Pause");
@@ -97,18 +120,18 @@ public class GameScreen extends JFrame {
 
         // Initialize TimeManager and start the timer
         timeManager.setTimerLabel(timerLabel);
-        timeManager.startTimer(300);
+        timeManager.startTimer(timeManager.getTotalTime());
 
         // Kitchen area setup
         JPanel kitchenPanel = new JPanel(new GridLayout(3, 2, 10, 10));
         kitchenPanel.setPreferredSize(new Dimension(300, 250));  // Set preferred size to control expansion
         kitchenAreaButtons = new JButton[6];
-        String[] buttonNames = {"Meat", "Cheese", "Lettuce", "Tomato", "Dough", "Pepperoni"};  // Button names
+
         for (int i = 0; i < kitchenAreaButtons.length; i++) {
-            kitchenAreaButtons[i] = new JButton(buttonNames[i]);
+            kitchenAreaButtons[i] = new JButton(GameLogic.MENU_ITEMS.get(i));
             kitchenPanel.add(kitchenAreaButtons[i]);
         }
-            
+
 
         // Restaurant area setup
         JPanel tablePanel = new JPanel(new GridLayout(3, 2, 10, 10));
@@ -144,10 +167,14 @@ public class GameScreen extends JFrame {
         // Create a panel for the buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        JButton inventoryButton = new JButton("Inventory");
-        JButton returnButton = new JButton("Return");
-        JButton serveButton = new JButton("Serve");
-        JButton trashButton = new JButton("Trash");
+        inventoryButton = new JButton("Inventory");
+        returnButton = new JButton("Return");
+        serveButton = new JButton("Serve");
+        trashButton = new JButton("Trash");
+
+        trashButton.setEnabled(false);
+        serveButton.setEnabled(false);
+        returnButton.setEnabled(false);
 
 
         // Add buttons to the button panel
@@ -179,8 +206,9 @@ public class GameScreen extends JFrame {
         returnMenuButton.addActionListener(e -> returnMenuButtonClicked());
         quitButton.addActionListener(e -> quitButtonClicked());
         for (int i = 0; i < tableAreaButtons.length; i++) {
+            int tableIndex =i;
             JButton tableAreaButton = tableAreaButtons[i];
-            tableAreaButton.addActionListener(e -> tableButtonClicked(tableAreaButton));
+            tableAreaButton.addActionListener(e -> tableButtonClicked(tableAreaButton, tableIndex));
         }
         for (int i = 0; i < kitchenAreaButtons.length; i++) {
             JButton kitchenAreaButton = kitchenAreaButtons[i];
@@ -191,8 +219,7 @@ public class GameScreen extends JFrame {
         serveButton.addActionListener(e -> serveButtonClicked());
         trashButton.addActionListener(e -> trashButtonClicked());
 
-
-// Layout management
+    // Layout management
         getContentPane().setLayout(new BorderLayout());
         add(topPanel, BorderLayout.NORTH);
         add(kitchenPanel, BorderLayout.WEST);
@@ -205,26 +232,87 @@ public class GameScreen extends JFrame {
         revalidate();
         repaint();
 
-
+        playBackgroundMusic("assets/game_background.wav");
     }
 
     private void trashButtonClicked() {
+        serving = false;
+        // Disable kitchen buttons
+        for (JButton kitchenButton : kitchenAreaButtons) {
+            kitchenButton.setEnabled(true);
+        }
+        inventoryButton.setEnabled(true);
+        serveButton.setEnabled(false);
+        returnButton.setEnabled(false);
+        trashButton.setEnabled(false);
+        gameLogic.trashItemsFromStand();
     }
 
     private void serveButtonClicked() {
+        serving = true;
+        // Disable kitchen buttons
+        for (JButton kitchenButton : kitchenAreaButtons) {
+            kitchenButton.setEnabled(false);
+        }
+        inventoryButton.setEnabled(false);
+        returnButton.setEnabled(false);
+        // Add other control buttons here if necessary
     }
 
-
     private void inventoryButtonClicked() {
-        
+        if (inventoryOpened){
+            for (int i = 0; i < kitchenAreaButtons.length; i++) {
+                kitchenAreaButtons[i].setText(GameLogic.MENU_ITEMS.get(i));
+            }
+            revalidate();
+            repaint();
+        }
+        else {
+            drawInventory();
+        }
+        inventoryOpened=!inventoryOpened;
+    }
+
+    public void drawInventory() {
+        List<Integer> numbers = gameLogic.inventoryOpened();
+        for (int i = 0; i < kitchenAreaButtons.length; i++) {
+            String txt ="<html>" + GameLogic.MENU_ITEMS.get(i)+"<br>Inventory: "+numbers.get(i)+"<br>Buy for $"+GameLogic.ITEM_PRICES.get(i)+"</html>";
+            kitchenAreaButtons[i].setText(txt);
+        }
+        revalidate();
+        repaint();
     }
 
     private void kitchenAreaButtonClicked(JButton kitchenAreaButton) {
-        addItemToStand(kitchenAreaButton.getText());  // Use the button's text as the item
+        if(inventoryOpened){
+
+            String htmlString = kitchenAreaButton.getText();
+
+            // Extract itemName
+            int startIndex = htmlString.indexOf(">") + 1;
+            int endIndex = htmlString.indexOf("<br>");
+            String itemName = htmlString.substring(startIndex, endIndex);
+
+            // Extract price
+            String pricePrefix = "Buy for $";
+            startIndex = htmlString.lastIndexOf(pricePrefix) + pricePrefix.length();
+            endIndex = htmlString.indexOf("</html>");
+            String itemPriceString = htmlString.substring(startIndex, endIndex);
+            // Cast itemPrice to float
+            float itemPrice = Float.parseFloat(itemPriceString.trim());
+            gameLogic.buyItem(itemName,itemPrice);
+        }
+        else{
+            String itemName = kitchenAreaButton.getText();
+            gameLogic.addItemToStand(itemName);
+        }
     }
 
+    public void addItemToStand(String item) {
+        trashButton.setEnabled(true);
+        serveButton.setEnabled(true);
+        returnButton.setEnabled(true);
 
-    private void addItemToStand(String item) {
         JLabel itemLabel = new JLabel(item);
         itemListPanel.add(itemLabel);
         itemListPanel.revalidate();
@@ -232,55 +320,69 @@ public class GameScreen extends JFrame {
     }
 
     private void returnButtonClicked() {
-        if (itemListPanel.getComponentCount() > 0) {
-            itemListPanel.remove(0);
-            itemListPanel.revalidate();
-            itemListPanel.repaint();
-        }
+        trashButton.setEnabled(false);
+        serveButton.setEnabled(false);
+        returnButton.setEnabled(false);
+        gameLogic.removeItemsFromStand();
     }
 
 
-    private void tableButtonClicked(JButton tableAreaButton) {
+    private void tableButtonClicked(JButton tableAreaButton, int tableIndex) {
 
+        String msg="";
         if (tableAreaButton.getBackground().equals(TABLE_EMPTY_COLOR)){
-            sendChatMessage("Table is empty.\n");
+            msg="Table is empty.\n";
+            sendChatMessage(msg);
         } else if (tableAreaButton.getBackground().equals(TABLE_THINKING_COLOR)) {
-            String a="";
+            Customer customer=restaurantManager.getCustomerAtTable(tableIndex);
+            msg=customer.getName()+" thinking";
+            sendChatMessage(msg);
         }else if (tableAreaButton.getBackground().equals(TABLE_ORDERED_COLOR)) {
-            String a="";
+            if (serving){
+                gameLogic.serveToTable(tableIndex);
+                trashButtonClicked();
+            }
+            else {
+                Customer customer = restaurantManager.getCustomerAtTable(tableIndex);
+                msg = customer.getName() + " ordered: " + customer.getOrder().getOrderString();
+                sendChatMessage(msg);
+            }
         }else if (tableAreaButton.getBackground().equals(TABLE_EATING_COLOR)) {
-            String a="";
+            Customer customer = restaurantManager.getCustomerAtTable(tableIndex);
+            Order order = customer.getOrder();
+            Order served = customer.getServed();
+            msg = customer.getName()+" ordered: "+order.getOrderString()+"\n   Received: "+served.getOrderString();
+            sendChatMessage(msg);
         }else if (tableAreaButton.getBackground().equals(TABLE_WAITING_TO_LEAVE_COLOR)) {
-            String a="";
+            gameLogic.collectMoneyFromTable(tableIndex);
         }
 
     }
 
-    public void addCustomerToTable(Customer customer, int tableIndex) {
+    public void tableNewCustomer(Customer customer, int tableIndex) {
         JButton tableButton = tableAreaButtons[tableIndex];
         tableButton.setBackground(TABLE_THINKING_COLOR);
         tableButton.setText(customer.getName());
         sendChatMessage(customer.getName() + " have arrived.\n");
     }
 
-    public void orderGiven(Customer customer, int tableIndex, Order order) {
-        StringBuilder orderMessage = new StringBuilder("Order: ");
-        for (String item : order.getItems()) {
-            orderMessage.append(item).append(" ");
-        }
-        JOptionPane.showMessageDialog(this, orderMessage.toString(), "Customer Order", JOptionPane.INFORMATION_MESSAGE);
-        orderMessage= new StringBuilder(orderMessage.toString() + " at " + customer.getName() + "\n");
-        sendChatMessage(orderMessage.toString());
-        tableAreaButtons[tableIndex].setText(customer.getName() + " - " + orderMessage.toString());
+    public void tableOrderGiven(Customer customer, int tableIndex, Order order) {
+        String orderMessage = customer.getName()+" Order: "+order.getOrderString();
+        sendChatMessage(orderMessage);
+        tableAreaButtons[tableIndex].setText(customer.getName() + " Ordered");
+        tableAreaButtons[tableIndex].setBackground(TABLE_ORDERED_COLOR);
     }
 
 
     private void saveButtonClicked() {
-        //A save system
+        GameState gameState = gameLogic.createGameState();
+        SaveLoadSystem saveLoadSystem = new SaveLoadSystem();
+        saveLoadSystem.saveGame(gameState, "savegame.dat");
+        sendChatMessage("Game saved successfully.");
     }
 
-
     private void resumeButtonClicked() {
+        playBackgroundMusic("assets/game_background.wav");
         timeManager.resumeTimer();
         pauseButton.setText("Pause");
         // Hide the pause menu and return to the stand panel
@@ -293,6 +395,9 @@ public class GameScreen extends JFrame {
     }
 
     private void pauseButtonClicked() {
+
+        stopBackgroundMusic();
+
         if (timeManager.isPaused()) {
             resumeButtonClicked();
         } else {
@@ -310,7 +415,10 @@ public class GameScreen extends JFrame {
         MainMenu mainMenu = new MainMenu();
         mainMenu.setVisible(true); // Show the main menu
     }
-    private void sendChatMessage(String text){
+    public void sendChatMessage(String text){
+        if (!text.endsWith("\n")){
+            text=text+"\n";
+        }
         gameChatArea.append(text);
     }
 
@@ -325,5 +433,61 @@ public class GameScreen extends JFrame {
     public void displayMessage(String message) {
         gameChatArea.append(message + "\n");
     }
-    
+
+    public void removeItemsFromStand() {
+        if (itemListPanel.getComponentCount() > 0) {
+            itemListPanel.removeAll();
+            itemListPanel.revalidate();
+            itemListPanel.repaint();
+        }
+    }
+
+    public void tableEating(Customer customer, int tableIndex) {
+        Order order = customer.getOrder();
+        Order served = customer.getServed();
+        String msg = customer.getName()+" ordered: "+order.getOrderString()+"\n   Received: "+served.getOrderString();
+        sendChatMessage(msg);
+        tableAreaButtons[tableIndex].setText(customer.getName() + " Eating");
+        tableAreaButtons[tableIndex].setBackground(TABLE_EATING_COLOR);
+    }
+
+    public void tableFinished(Customer customer, int tableIndex) {
+        String msg = customer.getName()+" ready to pay";
+        sendChatMessage(msg);
+        tableAreaButtons[tableIndex].setText(customer.getName() + " Finished");
+        tableAreaButtons[tableIndex].setBackground(TABLE_WAITING_TO_LEAVE_COLOR);
+    }
+
+    public void updateMoney(float money) {
+        moneyLabel.setText("Money: $" +money);
+        revalidate();
+        repaint();
+
+    }
+
+    public void tableEmptied(Customer customer, int tableIndex) {
+        String msg = customer.getName()+" paid "+customer.getPayment()+" and left";
+        sendChatMessage(msg);
+        tableAreaButtons[tableIndex].setText("Table "+tableIndex+1);
+        tableAreaButtons[tableIndex].setBackground(TABLE_EMPTY_COLOR);
+    }
+
+
+    private void playBackgroundMusic(String filePath) {
+        try {
+            File musicFile = new File(filePath);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicFile);
+            backgroundMusicClip = AudioSystem.getClip();
+            backgroundMusicClip.open(audioInputStream);
+            backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopBackgroundMusic() {
+        if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+            backgroundMusicClip.stop();
+        }
+    }
 }
