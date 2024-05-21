@@ -108,7 +108,7 @@ public class GameScreen extends JFrame {
 
         // Initialize TimeManager and start the timer
         timeManager.setTimerLabel(timerLabel);
-        timeManager.startTimer(300);
+        timeManager.startTimer(timeManager.getTotalTime());
 
         // Kitchen area setup
         JPanel kitchenPanel = new JPanel(new GridLayout(3, 2, 10, 10));

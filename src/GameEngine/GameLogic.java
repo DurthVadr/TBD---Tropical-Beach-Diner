@@ -42,11 +42,16 @@ public class GameLogic {
 
     public GameLogic(CustomerManager customerManager, InventoryManager inventoryManager,
                      RestaurantManager restaurantManager, TimeManager timeManager, GameScreen gameScreen) {
+        this.gameScreen = gameScreen;
         this.customerManager = customerManager;
         this.inventoryManager = inventoryManager;
         this.restaurantManager = restaurantManager;
         this.timeManager = timeManager;
-        this.gameScreen = gameScreen;
+
+        this.gameScreen.setGameLogic(this);
+        this.restaurantManager.setGameLogic(this);
+        this.timeManager.setGameLogic(this);
+
         this.standItems = new ArrayList<>();
 
     }
@@ -54,8 +59,6 @@ public class GameLogic {
     public void startNewGame() {
         // Placeholder for starting a new game
         System.out.println("New game started!");
-        gameScreen.setGameLogic(this);
-        restaurantManager.setGameLogic(this);
         gameScreen.initialize();
         gameScreen.setVisible(true);
         startCustomerArrival();
@@ -67,10 +70,13 @@ public class GameLogic {
         System.out.println("Game exited!");
     }
 
-    private void startCustomerArrival() {
-        System.out.println("In Start Customer");
+    void startCustomerArrival() {
+
+        int delay = timeManager.getSpecifiedTime("start");
+
+
+
         Timer customerTimer = new Timer();
-        Random random = new Random();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
@@ -83,7 +89,6 @@ public class GameLogic {
                         }
                     });
                     // Schedule the next customer
-                    int delay = (random.nextInt(6) + 5) * 1000;  // Random delay between 5 and 10 seconds
                     customerTimer.schedule(new TimerTask() {
                         @Override
                         public void run() {
@@ -97,12 +102,14 @@ public class GameLogic {
     }
 
     public void scheduleCustomerOrder(Customer customer, int tableIndex) {
+
+        int delay = timeManager.getSpecifiedTime("customerOrder");
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 SwingUtilities.invokeLater(() -> gaveOrder(customer, tableIndex));
             }
-        }, 2000); // 10 seconds delay for customers to think
+        }, delay);
     }
 
     private void gaveOrder(Customer customer, int tableIndex) {
@@ -153,13 +160,14 @@ public class GameLogic {
     }
 
     public void customerEating(Customer customer, int tableIndex) {
+        int delay = timeManager.getSpecifiedTime("eatingTime");
         gameScreen.tableEating(customer,tableIndex);
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 SwingUtilities.invokeLater(() -> customerFinished(customer, tableIndex));
             }
-        }, 5000); // 10 seconds delay for customers to think
+        }, delay);
     }
 
     private void customerFinished(Customer customer, int tableIndex) {
