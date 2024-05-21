@@ -26,7 +26,6 @@ public class GameLogic {
     public CustomerManager getCustomerManager() {
         return customerManager;
     }
-
     public RestaurantManager getRestaurantManager() {
         return restaurantManager;
     }
@@ -111,7 +110,7 @@ public class GameLogic {
                     });
                 }
             }
-        }, 0, 60000); // Decrease satisfaction every 60 seconds
+        }, 0, 10000); // Decrease satisfaction every 10 seconds
     }
 
 

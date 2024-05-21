@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.net.URL;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 public class CustomerManager {
@@ -40,15 +42,17 @@ public class CustomerManager {
                 while (scanner.hasNextLine()) {
                     response.append(scanner.nextLine());
                 }
-                // Parse the JSON response manually
-                String jsonResponse = response.toString();
-                // Extract the name from JSON (assuming it's a simple JSON structure)
-                int startIndex = jsonResponse.indexOf("\"first\":") + 9;
-                int endIndex = jsonResponse.indexOf("\",", startIndex);
-                String firstName = jsonResponse.substring(startIndex, endIndex);
-                startIndex = jsonResponse.indexOf("\"last\":") + 8;
-                endIndex = jsonResponse.indexOf("\",", startIndex);
-                String lastName = jsonResponse.substring(startIndex, endIndex);
+
+                // Debugging: Print the response
+                System.out.println("JSON Response: " + response.toString());
+
+                // Parse the JSON response using Jackson
+                ObjectMapper objectMapper = new ObjectMapper();
+                JsonNode rootNode = objectMapper.readTree(response.toString());
+                JsonNode resultsNode = rootNode.path("results").get(0);
+                JsonNode nameNode = resultsNode.path("name");
+                String firstName = nameNode.path("first").asText();
+                String lastName = nameNode.path("last").asText();
                 return firstName + " " + lastName;
             } else {
                 System.out.println("Error fetching random name: " + responseCode);
@@ -103,7 +107,10 @@ public class CustomerManager {
     }
 
     public List<Customer> getCustomers() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCustomers'");
+        List<Customer> customers = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            customers.add(createCustomer(i));
+        }
+        return customers;
     }
 }
