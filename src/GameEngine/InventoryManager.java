@@ -1,22 +1,25 @@
 package GameEngine;
 
+import Restaurant.Inventory;
 import Restaurant.Item;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class InventoryManager {
+
     private Map<Item, Integer> inventory;
 
     public InventoryManager() {
         inventory = new HashMap<>();
+        int defaultStartingInventory=5;
         // Add items to the inventory
-        inventory.put(new Item("Meat"),5);
-        inventory.put(new Item("Cheese"),5);
-        inventory.put(new Item("Lettuce"),5);
-        inventory.put(new Item("Tomato"),5);
-        inventory.put(new Item("Dough"),5);
-        inventory.put(new Item("Pepperoni"),5);
+        inventory.put(new Item("Meat"),defaultStartingInventory);
+        inventory.put(new Item("Cheese"),defaultStartingInventory);
+        inventory.put(new Item("Lettuce"),defaultStartingInventory);
+        inventory.put(new Item("Tomato"),defaultStartingInventory);
+        inventory.put(new Item("Dough"),defaultStartingInventory);
+        inventory.put(new Item("Pepperoni"),defaultStartingInventory);
         // Add more items as needed
     }
 
@@ -58,4 +61,11 @@ public class InventoryManager {
         }
     }
 
+    public Map<Item, Integer> getInventory(){
+        return inventory;
+    }
+
+    public void setInventory(Map<Item, Integer> inventory) {
+        this.inventory=inventory;
+    }
 }
