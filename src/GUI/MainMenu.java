@@ -1,21 +1,18 @@
 package GUI;
 
-import GameEngine.GameLogic;
+import GameEngine.*;
+import Persistence.GameState;
+import Persistence.SaveLoadSystem;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class MainMenu extends JFrame {
-    private GameLogic gameLogic;
-    private JLabel titleLabel;
     private JButton startGameButton;
-    private JButton loadGameButton;
-    private JButton optionsButton;
     private JButton exitGameButton;
 
 
-    public MainMenu(GameLogic gameLogic) {
-        this.gameLogic = gameLogic;
+    public MainMenu() {
         initUI();
     }
 
@@ -27,15 +24,15 @@ public class MainMenu extends JFrame {
         setResizable(false);
 
         // Initialize components
-        titleLabel = new JLabel("Tropical Beach Dinner", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Tropical Beach Dinner", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 36)); // Set font for the title
         titleLabel.setPreferredSize(new Dimension(1280, 130));
 
         startGameButton = new JButton("Start New Game");
         startGameButton.setPreferredSize(new Dimension(340, 100));
-        loadGameButton = new JButton("Load Game");
+        JButton loadGameButton = new JButton("Load Game");
         loadGameButton.setPreferredSize(new Dimension(340, 100));
-        optionsButton = new JButton("Options");
+        JButton optionsButton = new JButton("Options");
         optionsButton.setPreferredSize(new Dimension(340, 100));
         exitGameButton = new JButton("Exit Game");
         exitGameButton.setPreferredSize(new Dimension(340, 100));
@@ -81,13 +78,42 @@ public class MainMenu extends JFrame {
     }
 
     private void startGameButtonClicked() {
-        gameLogic.startNewGame();
+
+
+        // Initialize the game components
+        CustomerManager customerManager = new CustomerManager();
+        InventoryManager inventoryManager = new InventoryManager();
+        RestaurantManager restaurantManager = new RestaurantManager();
+        TimeManager timeManager = new TimeManager();
+        GameScreen gameScreen = new GameScreen();
+
+
+
+        // Initialize the game logic
+        GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
         dispose();
-        new GameScreen(gameLogic, this).setVisible(true); // Pass MainMenu reference
+        gameLogic.startNewGame();
     }
 
     private void loadGameButtonClicked() {
-        // Handle load game button action
+        SaveLoadSystem saveLoadSystem = new SaveLoadSystem();
+        GameState gameState = saveLoadSystem.loadGame("savegame.dat");
+
+        if (gameState != null) {
+            CustomerManager customerManager = new CustomerManager();
+            InventoryManager inventoryManager = new InventoryManager();
+            RestaurantManager restaurantManager = new RestaurantManager();
+            TimeManager timeManager = new TimeManager();
+            GameScreen gameScreen = new GameScreen();
+
+            // Initialize the game logic with the loaded state
+            GameLogic gameLogic = new GameLogic(customerManager, inventoryManager, restaurantManager, timeManager, gameScreen);
+
+            dispose();
+            gameLogic.loadGameState(gameState);
+        } else {
+            JOptionPane.showMessageDialog(this, "No saved game found!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void optionsButtonClicked() {
