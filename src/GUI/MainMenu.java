@@ -7,9 +7,16 @@ import Persistence.SaveLoadSystem;
 import javax.swing.*;
 import java.awt.*;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+import java.io.IOException;
+
 public class MainMenu extends JFrame {
     private JButton startGameButton;
     private JButton exitGameButton;
+    private Clip backgroundMusicClip;
 
 
     public MainMenu() {
@@ -75,9 +82,12 @@ public class MainMenu extends JFrame {
         loadGameButton.addActionListener(e -> loadGameButtonClicked());
         optionsButton.addActionListener(e -> optionsButtonClicked());
         exitGameButton.addActionListener(e -> exitGameButtonClicked());
+
+        playBackgroundMusic("assets/main_menu.wav");
     }
 
     private void startGameButtonClicked() {
+        stopBackgroundMusic();
 
 
         // Initialize the game components
@@ -121,6 +131,7 @@ public class MainMenu extends JFrame {
     }
 
     private void exitGameButtonClicked() {
+        stopBackgroundMusic();
         System.exit(0);
     }
 
@@ -137,5 +148,23 @@ public class MainMenu extends JFrame {
         panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         panel.add(button);
         return panel;
+    }
+
+    private void playBackgroundMusic(String filePath) {
+        try {
+            File musicFile = new File(filePath);
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicFile);
+            backgroundMusicClip = AudioSystem.getClip();
+            backgroundMusicClip.open(audioInputStream);
+            backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void stopBackgroundMusic() {
+        if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+            backgroundMusicClip.stop();
+        }
     }
 }
