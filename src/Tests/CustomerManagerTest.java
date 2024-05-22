@@ -1,4 +1,11 @@
+package Tests;
+
 import static org.junit.jupiter.api.Assertions.*;
+
+import GameEngine.CustomerManager;
+import Restaurant.Customer;
+import Restaurant.Item;
+import Restaurant.Order;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;

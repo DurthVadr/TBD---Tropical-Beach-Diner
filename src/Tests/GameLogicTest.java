@@ -1,4 +1,10 @@
+package Tests;
+
 import static org.junit.jupiter.api.Assertions.*;
+
+import GUI.GameScreen;
+import GameEngine.*;
+import Restaurant.Customer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

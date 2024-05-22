@@ -21,6 +21,11 @@ public class GameLogic {
     private final InventoryManager inventoryManager;
     private final RestaurantManager restaurantManager;
     private final TimeManager timeManager;
+
+    public List<Item> getStandItems() {
+        return standItems;
+    }
+
     private final List<Item> standItems;
 
     public CustomerManager getCustomerManager() {

@@ -1,4 +1,9 @@
+package Tests;
+
 import static org.junit.jupiter.api.Assertions.*;
+
+import GameEngine.InventoryManager;
+import Restaurant.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
