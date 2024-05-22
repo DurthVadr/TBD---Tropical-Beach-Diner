@@ -3,19 +3,10 @@ package GameEngine;
 import Restaurant.Customer;
 import Restaurant.Item;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-import java.net.URL;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.javafaker.Faker;
 
 
 public class CustomerManager {
@@ -28,47 +19,10 @@ public class CustomerManager {
     }
 
     public String fetchRandomName() {
-        HttpURLConnection connection = null;
-        Scanner scanner = null;
-        try {
-            URL url = new URL(RANDOM_USER_API_URL);
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
+        Faker faker = new Faker();
 
-            int responseCode = connection.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                scanner = new Scanner(connection.getInputStream());
-                StringBuilder response = new StringBuilder();
-                while (scanner.hasNextLine()) {
-                    response.append(scanner.nextLine());
-                }
-
-                // Debugging: Print the response
-                System.out.println("JSON Response: " + response.toString());
-
-                // Parse the JSON response using Jackson
-                ObjectMapper objectMapper = new ObjectMapper();
-                JsonNode rootNode = objectMapper.readTree(response.toString());
-                JsonNode resultsNode = rootNode.path("results").get(0);
-                JsonNode nameNode = resultsNode.path("name");
-                String firstName = nameNode.path("first").asText();
-                String lastName = nameNode.path("last").asText();
-                return firstName + " " + lastName;
-            } else {
-                System.out.println("Error fetching random name: " + responseCode);
-                return "Customer" + new Random().nextInt(1000);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Customer" + new Random().nextInt(1000);
-        } finally {
-            if (scanner != null) {
-                scanner.close();
-            }
-            if (connection != null) {
-                connection.disconnect();
-            }
-        }
+        String name = faker.name().fullName();
+        return name;
     }
 
 

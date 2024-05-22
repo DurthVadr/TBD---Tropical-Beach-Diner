@@ -8,7 +8,6 @@ import Restaurant.Item;
 import Restaurant.Order;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
 
 public class CustomerManagerTest {
     private CustomerManager customerManager;
