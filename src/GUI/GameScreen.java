@@ -464,14 +464,17 @@ public class GameScreen extends JFrame {
         Order served = customer.getServed();
         String msg = customer.getName()+" ordered: "+order.getOrderString()+"\n   Received: "+served.getOrderString();
         sendChatMessage(msg);
-        tableAreaButtons[tableIndex].setText(customer.getName() + " Eating");
+        String txt ="<html>" + customer.getName()+"<br>Eating</html>";
+        tableAreaButtons[tableIndex].setText(txt);
         tableAreaButtons[tableIndex].setBackground(TABLE_EATING_COLOR);
     }
 
     public void tableFinished(Customer customer, int tableIndex) {
         String msg = customer.getName()+" ready to pay";
         sendChatMessage(msg);
-        tableAreaButtons[tableIndex].setText(customer.getName() + " Finished");
+        String txt ="<html>" + customer.getName()+"<br>Finished</html>";
+
+        tableAreaButtons[tableIndex].setText(txt);
         tableAreaButtons[tableIndex].setBackground(TABLE_WAITING_TO_LEAVE_COLOR);
     }
 
