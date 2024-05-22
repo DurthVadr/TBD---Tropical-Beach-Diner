@@ -232,7 +232,7 @@ public class GameScreen extends JFrame {
         revalidate();
         repaint();
 
-        playBackgroundMusic("assets/game_background.wav");
+        playBackgroundMusic("assets\\game_background.wav");
     }
 
     private void trashButtonClicked() {

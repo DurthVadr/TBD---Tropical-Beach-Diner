@@ -11,6 +11,7 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 
@@ -84,6 +85,9 @@ public class MainMenu extends JFrame {
         loadGameButton.addActionListener(e -> loadGameButtonClicked());
         creditsButton.addActionListener(e -> creditsButtonClicked());
         exitGameButton.addActionListener(e -> exitGameButtonClicked());
+
+        // Debug: Print the current working directory
+        System.out.println("Current working directory: " + new File(".").getAbsolutePath());
 
         playBackgroundMusic("assets/main_menu.wav");
     }
@@ -161,6 +165,11 @@ public class MainMenu extends JFrame {
     private void playBackgroundMusic(String filePath) {
         try {
             File musicFile = new File(filePath);
+            System.out.println("Trying to play file: " + musicFile.getAbsolutePath()); // Debug print
+            if (!musicFile.exists()) {
+                System.out.println("File does not exist: " + musicFile.getAbsolutePath()); // Debug print
+                throw new FileNotFoundException("The specified audio file was not found: " + filePath);
+            }
             AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicFile);
             backgroundMusicClip = AudioSystem.getClip();
             backgroundMusicClip.open(audioInputStream);
@@ -169,6 +178,7 @@ public class MainMenu extends JFrame {
             e.printStackTrace();
         }
     }
+
 
     private void stopBackgroundMusic() {
         if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
