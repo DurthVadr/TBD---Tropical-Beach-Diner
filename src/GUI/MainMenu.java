@@ -7,9 +7,18 @@ import Persistence.SaveLoadSystem;
 import javax.swing.*;
 import java.awt.*;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+
 public class MainMenu extends JFrame {
     private JButton startGameButton;
     private JButton exitGameButton;
+    private Clip backgroundMusicClip;
 
 
     public MainMenu() {
@@ -24,16 +33,17 @@ public class MainMenu extends JFrame {
         setResizable(false);
 
         // Initialize components
-        JLabel titleLabel = new JLabel("Tropical Beach Dinner", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 36)); // Set font for the title
+        JLabel titleLabel = new JLabel("Tropical Beach Diner", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Chalkboard", Font.BOLD, 36)); // Set font for the title
+        titleLabel.setForeground(new Color(255, 69, 0)); // bright orange
         titleLabel.setPreferredSize(new Dimension(1280, 130));
 
         startGameButton = new JButton("Start New Game");
         startGameButton.setPreferredSize(new Dimension(340, 100));
         JButton loadGameButton = new JButton("Load Game");
         loadGameButton.setPreferredSize(new Dimension(340, 100));
-        JButton optionsButton = new JButton("Options");
-        optionsButton.setPreferredSize(new Dimension(340, 100));
+        JButton creditsButton = new JButton("Credits");
+        creditsButton.setPreferredSize(new Dimension(340, 100));
         exitGameButton = new JButton("Exit Game");
         exitGameButton.setPreferredSize(new Dimension(340, 100));
 
@@ -55,7 +65,7 @@ public class MainMenu extends JFrame {
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20))); // Add spacing between buttons
         centerPanel.add(createButtonPanel(loadGameButton));
         centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        centerPanel.add(createButtonPanel(optionsButton));
+        centerPanel.add(createButtonPanel(creditsButton));
         centerPanel.add(Box.createVerticalGlue());
 
         // Bottom panel for the exit button with padding
@@ -73,11 +83,17 @@ public class MainMenu extends JFrame {
         // Add action listeners
         startGameButton.addActionListener(e -> startGameButtonClicked());
         loadGameButton.addActionListener(e -> loadGameButtonClicked());
-        optionsButton.addActionListener(e -> optionsButtonClicked());
+        creditsButton.addActionListener(e -> creditsButtonClicked());
         exitGameButton.addActionListener(e -> exitGameButtonClicked());
+
+        // Debug: Print the current working directory
+        System.out.println("Current working directory: " + new File(".").getAbsolutePath());
+
+        playBackgroundMusic("assets/main_menu.wav");
     }
 
     private void startGameButtonClicked() {
+        stopBackgroundMusic();
 
 
         // Initialize the game components
@@ -116,11 +132,18 @@ public class MainMenu extends JFrame {
         }
     }
 
-    private void optionsButtonClicked() {
-        // Handle options button action
+    private void creditsButtonClicked() {
+        JOptionPane.showMessageDialog(this, "Tropical Beach Diner\n\nDeveloped by:\n" +
+        "- Ata Seyhan\n" +
+        "- Can Çağatay Sevgican\n" +
+        "- Halil Nebioğlu\n" +
+        "- Kerem Bayram\n" +
+        "- Mertcan Sağlam\n", "Credits", JOptionPane.INFORMATION_MESSAGE);
+        
     }
 
     private void exitGameButtonClicked() {
+        stopBackgroundMusic();
         System.exit(0);
     }
 
@@ -137,5 +160,29 @@ public class MainMenu extends JFrame {
         panel.setLayout(new FlowLayout(FlowLayout.CENTER));
         panel.add(button);
         return panel;
+    }
+
+    private void playBackgroundMusic(String filePath) {
+        try {
+            File musicFile = new File(filePath);
+            System.out.println("Trying to play file: " + musicFile.getAbsolutePath()); // Debug print
+            if (!musicFile.exists()) {
+                System.out.println("File does not exist: " + musicFile.getAbsolutePath()); // Debug print
+                throw new FileNotFoundException("The specified audio file was not found: " + filePath);
+            }
+            AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(musicFile);
+            backgroundMusicClip = AudioSystem.getClip();
+            backgroundMusicClip.open(audioInputStream);
+            backgroundMusicClip.loop(Clip.LOOP_CONTINUOUSLY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void stopBackgroundMusic() {
+        if (backgroundMusicClip != null && backgroundMusicClip.isRunning()) {
+            backgroundMusicClip.stop();
+        }
     }
 }
