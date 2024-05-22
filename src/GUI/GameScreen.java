@@ -384,7 +384,9 @@ public class GameScreen extends JFrame {
     public void tableOrderGiven(Customer customer, int tableIndex, Order order) {
         String orderMessage = customer.getName()+" Order: "+order.getOrderString();
         sendChatMessage(orderMessage);
-        tableAreaButtons[tableIndex].setText(customer.getName() + " Ordered");
+        String txt ="<html>" + customer.getName()+"<br>Ordered</html>";
+
+        tableAreaButtons[tableIndex].setText(txt);
         tableAreaButtons[tableIndex].setBackground(TABLE_ORDERED_COLOR);
     }
 
